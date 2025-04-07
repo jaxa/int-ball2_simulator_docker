@@ -1,5 +1,6 @@
 # FROM osrf/ros:melodic-desktop-full
-FROM ubuntu:18.04
+# Base image's CPU architecture is needed to match with Qt's architecture.
+FROM --platform=linux/amd64 ubuntu:18.04
 
 RUN apt clean && apt update &&\
     apt install -y wget git vim curl gnupg2 lsb-release iproute2
