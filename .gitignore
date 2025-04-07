@@ -1,22 +1,15 @@
-.vagrant*
-bin
-docker/docker
-.*.swp
-a.out
-*.orig
-build_src
-.flymake*
-.idea
+# Qt認証情報を含む可能性のあるファイル
+qt-installer-nonintaractive.qs
+
+# 一時ファイルと中間生成物
+*.tar
+*.tar.gz
+*.log
 .DS_Store
-docs/_build
-docs/_static
-docs/_templates
-.gopath/
-.dotcloud
-*.test
-bundles/
-.hg/
-.git/
-vendor/pkg/
-pyenv
-Vagrantfile
+.vscode/
+tmp/
+temp/
+
+# ビルドディレクトリと一時イメージ
+build/
+node_modules/

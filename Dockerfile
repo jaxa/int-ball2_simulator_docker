@@ -1,5 +1,24 @@
-# FROM osrf/ros:melodic-desktop-full
-# Base image's CPU architecture is needed to match with Qt's architecture.
+# ステージ1: Qtをインストール
+FROM --platform=linux/amd64 ubuntu:18.04 as qt-builder
+
+# Qtインストールに必要な依存関係をインストール
+RUN apt update && apt install -y wget
+
+# Qtインストーラをダウンロード
+RUN mkdir -p /opt/Qt/install
+RUN cd /opt/Qt && wget https://download.qt.io/archive/qt/5.12/5.12.3/qt-opensource-linux-x64-5.12.3.run
+
+# 外部で生成したqsファイルをコピー
+COPY qt-installer-nonintaractive.qs /opt/Qt/
+
+# Qtをインストール
+RUN cd /opt/Qt && \
+    chmod +x qt-opensource-linux-x64-5.12.3.run && \
+    chmod +x qt-installer-nonintaractive.qs && \
+    ./qt-opensource-linux-x64-5.12.3.run --script qt-installer-nonintaractive.qs --verbose --platform minimal && \
+    ln -s /opt/Qt/install/5.12.3 /opt/Qt/5
+
+# ステージ2: 最終イメージ
 FROM --platform=linux/amd64 ubuntu:18.04
 
 RUN apt clean && apt update &&\
@@ -13,7 +32,7 @@ RUN pip3 install psutil
 
 # Time zone settings
 RUN DEBIAN_FRONTEND=noninteractive apt install -y tzdata
-ENV TZ Asia/Tokyo
+ENV TZ=Asia/Tokyo
 
 # Install ROS Melodic
 RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
@@ -56,8 +75,6 @@ RUN git clone https://github.com/FFmpeg/FFmpeg.git -b n4.1.3 /usr/local/src/ffmp
     make install
 
 # Install VLC Media Player
-# Note: To avoid build errors, "vlc.appdata.xml" must be created by copying a specific file. See below:
-# https://stackoverflow.com/questions/54904765/ubuntu-16-04-compile-vlc-for-android-failed
 RUN apt install -y libasound2-dev libxcb-shm0-dev libxcb-xv0-dev \
                 libxcb-keysyms1-dev libxcb-randr0-dev libxcb-composite0-dev \
                 lua5.2 lua5.2-dev protobuf-compiler bison libdvbpsi-dev libpulse-dev
@@ -84,24 +101,13 @@ RUN cd /usr/local/src &&\
     make install &&\
     ln -s /usr/local/src/vlc-3.0.7.1 /usr/local/src/vlc
 
-# Install Qt
-RUN mkdir -p /opt/Qt/install
-# COPY qt-opensource-linux-x64-5.12.3.run /opt/Qt
-RUN cd /opt/Qt &&\
-    wget https://download.qt.io/archive/qt/5.12/5.12.3/qt-opensource-linux-x64-5.12.3.run
-COPY qt-installer-nonintaractive.qs /opt/Qt
-RUN cd /opt/Qt &&\
-    chmod +x qt-opensource-linux-x64-5.12.3.run &&\
-    chmod +x qt-installer-nonintaractive.qs &&\
-    ./qt-opensource-linux-x64-5.12.3.run --script qt-installer-nonintaractive.qs --verbose --platform minimal &&\
-    ln -s /opt/Qt/install/5.12.3 /opt/Qt/5
+# Qtインストール済みディレクトリをコピー（認証情報を含まない）
+COPY --from=qt-builder /opt/Qt /opt/Qt
 
 # Install Font File
 RUN apt install -y fonts-roboto
 
 # Install Docker
-# Need to install init and systemd to execute docker daemon in a docker container (docker-in-docker). See below:
-# https://zenn.dev/ippe1/articles/327f2b1ed423cb
 RUN apt update &&\
     apt install -y init systemd
 RUN apt install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
@@ -123,5 +129,6 @@ RUN apt install -y libpcl-dev ros-melodic-pcl-ros &&\
 # Download int-ball2_platform_works repository
 WORKDIR /home 
 RUN git clone https://github.com/jaxa/int-ball2_platform_works.git
-RUN cd /home/int-ball2_platform_works/platform_docker/template &&\
-    docker build . -t ib2_user:0.1
+
+# Docker-in-Dockerは実行時に設定
+CMD ["/bin/bash"]

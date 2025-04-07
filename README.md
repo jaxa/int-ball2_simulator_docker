@@ -1,35 +1,55 @@
-## How to Use
-Qtのインストールにはアカウント作成が必要となる。
-[Qt公式サイト](https://login.qt.io/login)でアカウント登録を予め行っておくこと。
-`qt-installer-nonintaractive.qs`の中の以下の箇所を、登録ユーザのメールアドレス・パスワードに置き換える。
+## 使用方法
 
-qt-installer-nonintaractive.qs
-```javascript
-（中略）
-Controller.prototype.CredentialsPageCallback = function() {
-    var page = gui.pageWidgetByObjectName("CredentialsPage");
-    page.loginWidget.EmailLineEdit.setText("Your Email");
-    page.loginWidget.PasswordLineEdit.setText("Your Password");
-    gui.clickButton(buttons.NextButton);
-}
-（中略）
+### ステップ1: Dockerイメージのビルド
+
+```bash
+# 実行権限を付与
+chmod +x generate-qt-installer.sh build.sh init-container.sh run-container.sh
+
+# イメージのビルド
+./build.sh your.email@example.com your_password
 ```
 
-Dockerイメージをビルドする。かなり時間がかかるので気長に待つ。
+**注意**: パスワードはコマンドライン履歴に残る可能性があります。`history -c`でコマンド履歴を消去できます。
+
+### ステップ2: シミュレータの実行
+
+#### オプション1: run-container.sh スクリプトを使用（推奨）
+
 ```bash
-cd <this packgage>
-docker build ./ -t ib2_simulator
+# 対話モードで実行
+./run-container.sh
+
+# または、バックグラウンドで実行
+./run-container.sh --detach
 ```
 
-生成したDockerイメージ`ib2_simulator`を使ってコンテナを生成する。
+#### オプション2: Docker Composeを使用
+
 ```bash
-cd <this packgage>
 docker compose up
 ```
 
-## 役に立ったサイト
--[ROS Docker イメージで発生した GPG error の解消方法](https://zuqqhi2.com/ros-docker-image-gpg-error)
-- [dind(docker-in-docker)とdood(docker-outside-of-docker)でコンテナを料理する](https://qiita.com/t_katsumura/items/d5be6afadd6ec6545a9d)
-- [【ubuntu】Dockerでsystemctlを使えるようにする](https://zenn.dev/ippe1/articles/327f2b1ed423cb)
-- [stack overflow: Ubuntu 16.04 Compile VLC for Android Failed](https://stackoverflow.com/questions/54904765/ubuntu-16-04-compile-vlc-for-android-failed)
-- 
+#### オプション3: Docker コマンドを直接使用
+
+```bash
+docker run -it --privileged \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v /tmp/.X11-unix:/tmp/.X11-unix \
+  -v $HOME/.Xauthority:/root/.Xauthority \
+  -e DISPLAY=$DISPLAY \
+  ib2_simulator /init-container.sh
+```
+
+## ファイル構成
+
+- `Dockerfile`: マルチステージビルドによるイメージ定義
+- `generate-qt-installer.sh`: Qtインストーラー用スクリプト生成
+- `build.sh`: セキュアなイメージビルドプロセス
+- `init-container.sh`: コンテナ起動時の初期化スクリプト
+- `run-container.sh`: コンテナ実行用スクリプト
+- `docker-compose.yml`: Docker Compose設定
+- `.gitignore`: 機密ファイルのリポジトリへの登録を防止
+
+
+
