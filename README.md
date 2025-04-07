@@ -10,6 +10,31 @@ docker build --build-arg QT_EMAIL=your.email@example.com --build-arg QT_PASSWORD
 docker build --build-arg QT_EMAIL=your.email@example.com --build-arg QT_PASSWORD=your_password -t ib2_simulator .
 ```
 
+vcxsrv
+「Native OpenGL」オプションにチェックを入れる
+「Additional parameters for VcXsrv」の欄に -wgl を追加
+
+
+
+docker-compose up -d
+
+docker exec -it ib2_simulator bash
+
+cd /home/int-ball2_simulator/Int-Ball2_platform_gse
+source devel/setup.bash
+roslaunch platform_gui bringup.launch
+
+cd int-ball2_simulator/Int-Ball2_platform_simulator
+
+source devel/setup.bash
+rosrun platform_sim_tools simulator_bringup.sh
+
+
+docker-compose down
+
+
+simとplatformの位置をきれいにしないと
+
 ### 実行方法
 
 ```bash
@@ -30,3 +55,4 @@ docker run -it --privileged \
 ```bash
 docker exec -it ib2_simulator bash
 ```
+

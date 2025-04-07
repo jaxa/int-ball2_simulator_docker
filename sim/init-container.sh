@@ -20,39 +20,34 @@ else
   service docker start
 fi
 
-# Dockerデーモンの起動を待機
+# Dockerデーモンの起動を待機（短縮版）
 echo "Dockerデーモンの起動を待機しています..."
 COUNTER=0
-MAX_TRIES=30
+MAX_TRIES=10
 until docker info >/dev/null 2>&1; do
   COUNTER=$((COUNTER+1))
   if [ $COUNTER -gt $MAX_TRIES ]; then
-    echo -e "${RED}Dockerデーモンの起動タイムアウト${NC}"
-    echo "続行しますが、Docker-in-Docker機能は利用できません"
+    echo -e "${YELLOW}警告: Dockerデーモンの起動タイムアウト${NC}"
+    echo "続行しますが、Docker機能は利用できない可能性があります"
     break
   fi
   echo "Dockerデーモンの起動を待機中... ($COUNTER/$MAX_TRIES)"
   sleep 1
 done
 
-# Dockerが起動している場合のみ、ib2_userイメージをビルド
 if docker info >/dev/null 2>&1; then
   echo -e "${GREEN}Dockerデーモンが起動しました${NC}"
   
-  # Int-Ball2 ユーザイメージのビルド
-  if [ -d "/home/int-ball2_platform_works/platform_docker/template" ]; then
-    echo "Int-Ball2 ユーザイメージのビルドを開始します..."
-    cd /home/int-ball2_platform_works/platform_docker/template
-    if docker build . -t ib2_user:0.1; then
-      echo -e "${GREEN}Int-Ball2 ユーザイメージのビルドが完了しました${NC}"
-    else
-      echo -e "${YELLOW}警告: Int-Ball2 ユーザイメージのビルドに失敗しました${NC}"
-    fi
+  # ib2_userイメージの存在確認
+  if docker image inspect ib2_user:0.1 &>/dev/null; then
+    echo -e "${GREEN}ib2_userイメージが見つかりました${NC}"
   else
-    echo -e "${YELLOW}警告: Int-Ball2 プラットフォームワークディレクトリが見つかりません${NC}"
+    echo -e "${YELLOW}警告: ib2_userイメージが見つかりません。事前にビルドが必要です。${NC}"
+    echo "ホスト側で以下のコマンドを実行してください："
+    echo "cd /path/to/int-ball2_platform_works/platform_docker/template && docker build -t ib2_user:0.1 ."
   fi
 else
-  echo -e "${YELLOW}警告: Dockerデーモンが起動していないため、ib2_userイメージのビルドをスキップします${NC}"
+  echo -e "${YELLOW}警告: Dockerデーモンが起動していないため、Docker機能は利用できません${NC}"
 fi
 
 # ROS環境変数の設定

@@ -30,3 +30,5 @@ temp/
 build/
 node_modules/
 dist/
+
+shared_data/

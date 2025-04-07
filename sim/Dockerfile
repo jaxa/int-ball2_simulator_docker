@@ -191,7 +191,7 @@ RUN cd /usr/local/src && \
                 --enable-x264 \
                 --enable-x26410b \
                 --enable-dvbpsi && \
-    make install && \
+    make install -j$(nproc)&& \
     ln -s /usr/local/src/vlc-3.0.7.1 /usr/local/src/vlc
 
 # Qtインストール済みディレクトリをコピー（認証情報を含まない）
@@ -211,17 +211,18 @@ RUN apt-get install -y docker-ce docker-ce-cli containerd.io
 RUN pip3 install docker defusedxml netifaces
 
 # Download and build int-ball2_simulator
-WORKDIR /home 
+RUN mkdir -p /home/nvidia/IB2
+WORKDIR /home/nvidia/IB2
 RUN git clone https://github.com/jaxa/int-ball2_simulator.git
-RUN cd /home/int-ball2_simulator/Int-Ball2_platform_gse && \
+RUN cd /home/nvidia/IB2/int-ball2_simulator/Int-Ball2_platform_gse && \
     /bin/bash -c "source /opt/ros/melodic/setup.bash; catkin_make"
 RUN apt-get install -y libpcl-dev ros-melodic-pcl-ros && \
     cd /home/int-ball2_simulator/Int-Ball2_platform_simulator && \
     /bin/bash -c "source /opt/ros/melodic/setup.bash; catkin_make –DWITH_PCA9685=OFF"
 
 # Download int-ball2_platform_works repository
-WORKDIR /home 
-RUN git clone https://github.com/jaxa/int-ball2_platform_works.git
+WORKDIR /home/nvidia
+COPY platform_works /home/nvidia/platform_works
 
 # 初期化スクリプトの追加
 COPY init-container.sh /
