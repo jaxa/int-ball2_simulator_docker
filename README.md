@@ -10,6 +10,9 @@ docker build --build-arg QT_EMAIL=your.email@example.com --build-arg QT_PASSWORD
 docker build --build-arg QT_EMAIL=your.email@example.com --build-arg QT_PASSWORD=your_password -t ib2_simulator .
 ```
 
+
+git clone --recursive https://github.com/AkihikoHONDA/ib2sim_docker_test.git
+
 vcxsrv
 「Native OpenGL」オプションにチェックを入れる
 「Additional parameters for VcXsrv」の欄に -wgl を追加
