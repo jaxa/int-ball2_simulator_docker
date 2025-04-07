@@ -1,55 +1,32 @@
-## 使用方法
+## クイックスタート
 
-### ステップ1: Dockerイメージのビルド
+### ビルド方法
 
 ```bash
-# 実行権限を付与
-chmod +x generate-qt-installer.sh build.sh init-container.sh run-container.sh
+# Windows PowerShell または コマンドプロンプト
+docker build --build-arg QT_EMAIL=your.email@example.com --build-arg QT_PASSWORD=your_password -t ib2_simulator .
 
-# イメージのビルド
-./build.sh your.email@example.com your_password
+# Linux/macOS
+docker build --build-arg QT_EMAIL=your.email@example.com --build-arg QT_PASSWORD=your_password -t ib2_simulator .
 ```
 
-**注意**: パスワードはコマンドライン履歴に残る可能性があります。`history -c`でコマンド履歴を消去できます。
-
-### ステップ2: シミュレータの実行
-
-#### オプション1: run-container.sh スクリプトを使用（推奨）
+### 実行方法
 
 ```bash
-# 対話モードで実行
-./run-container.sh
+# 方法1: Docker Composeを使用（推奨）
+docker-compose up -d
 
-# または、バックグラウンドで実行
-./run-container.sh --detach
-```
-
-#### オプション2: Docker Composeを使用
-
-```bash
-docker compose up
-```
-
-#### オプション3: Docker コマンドを直接使用
-
-```bash
+# 方法2: Docker コマンドを直接使用
 docker run -it --privileged \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
   -v $HOME/.Xauthority:/root/.Xauthority \
   -e DISPLAY=$DISPLAY \
-  ib2_simulator /init-container.sh
+  ib2_simulator
 ```
 
-## ファイル構成
+### コンテナに接続
 
-- `Dockerfile`: マルチステージビルドによるイメージ定義
-- `generate-qt-installer.sh`: Qtインストーラー用スクリプト生成
-- `build.sh`: セキュアなイメージビルドプロセス
-- `init-container.sh`: コンテナ起動時の初期化スクリプト
-- `run-container.sh`: コンテナ実行用スクリプト
-- `docker-compose.yml`: Docker Compose設定
-- `.gitignore`: 機密ファイルのリポジトリへの登録を防止
-
-
-
+```bash
+docker exec -it ib2_simulator bash
+```

@@ -1,11 +1,27 @@
-# Qt認証情報を含む可能性のあるファイル
+# OS固有のファイル
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# エディタ/IDE固有のファイル
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Docker関連
+.docker/
+docker-compose.override.yml
+
+# Qtインストーラー関連（念のため）
 qt-installer-nonintaractive.qs
+*.run
 
 # 一時ファイルと中間生成物
 *.tar
 *.tar.gz
 *.log
-.DS_Store
 .vscode/
 tmp/
 temp/
@@ -13,3 +29,4 @@ temp/
 # ビルドディレクトリと一時イメージ
 build/
 node_modules/
+dist/
