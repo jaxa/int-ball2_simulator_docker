@@ -165,7 +165,7 @@ RUN git clone https://github.com/FFmpeg/FFmpeg.git -b n4.1.3 /usr/local/src/ffmp
                 --enable-libx264 \
                 --enable-encoder=png \
                 --enable-version3 && \
-    make install
+    make install -j$(nproc)
 
 # Install VLC Media Player
 RUN apt-get install -y libasound2-dev libxcb-shm0-dev libxcb-xv0-dev \
