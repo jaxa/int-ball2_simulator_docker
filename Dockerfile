@@ -1,12 +1,24 @@
 # ステージ1: Qtをインストール
 FROM --platform=linux/amd64 ubuntu:18.04 as qt-builder
+# 注: --platform フラグは Qt インストーラーが x86 専用のため必要
 
 # ビルド引数として認証情報を受け取る
+# 注: ビルド時のみ使用し、最終イメージには含まれない安全な方法
 ARG QT_EMAIL
 ARG QT_PASSWORD
+# hadolint ignore=DL3023
 
 # Qtインストールに必要な依存関係をインストール
-RUN apt-get update && apt-get install -y wget
+RUN apt-get update && apt-get install -y \
+    wget \
+    libdbus-1-3 \
+    libfontconfig1 \
+    libx11-6 \
+    libx11-xcb1 \
+    libxext6 \
+    libxkbcommon-x11-0 \
+    libxrender1 \
+    libgl1-mesa-glx
 
 # Qtインストーラをダウンロード
 RUN mkdir -p /opt/Qt/install
@@ -100,6 +112,7 @@ RUN cd /opt/Qt && \
 
 # ステージ2: 最終イメージの構築
 FROM --platform=linux/amd64 ubuntu:18.04
+# 注: --platform フラグは Qt インストーラーが x86 専用のため必要
 
 RUN apt-get clean && apt-get update && \
     apt-get install -y wget git vim curl gnupg2 lsb-release iproute2
