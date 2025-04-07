@@ -1,0 +1,21 @@
+version: '2'
+
+services:
+  master:
+    image: ib2_simulator:latest
+    container_name: ib2_simulator
+    runtime: nvidia
+    privileged: true
+    network_mode: host
+    ipc: host
+    environment:
+      - DISPLAY
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - QT_X11_NO_MITSHM=1
+    tty: true
+    volumes: 
+      - /home/$USER:/home/$USER:rw 
+      - $HOME/.Xauthority:/root/.Xauthority
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    command: /sbin/init
