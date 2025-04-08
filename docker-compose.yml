@@ -24,13 +24,13 @@ services:
       - ./shared_data:/home/shared_data:rw
       - /var/run/docker.sock:/var/run/docker.sock
       - /sys/fs/cgroup:/sys/fs/cgroup:ro  # systemd用のcgroupマウント
-    # 初期化スクリプトを実行せず、systemdのみを起動
-    command: /sbin/init
+    command: /sbin/init # 初期化スクリプトを実行せず、systemdのみを起動
 
   prog:
     image: ib2_user:0.1
     container_name: ib2_user
     privileged: true
+    network_mode: host
     depends_on:
       - simulator
     environment:

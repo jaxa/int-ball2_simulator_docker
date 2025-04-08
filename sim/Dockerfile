@@ -117,6 +117,11 @@ FROM --platform=linux/amd64 ubuntu:18.04
 RUN apt-get clean && apt-get update && \
     apt-get install -y wget git vim curl gnupg2 lsb-release iproute2
 
+# Prepare for Gazebo
+RUN sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
+RUN wget https://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
+RUN sudo apt-get update
+
 # Install Python3 packages
 RUN apt-get install -y python3 python3-pip
 RUN pip3 install rospkg 
@@ -211,18 +216,34 @@ RUN apt-get install -y docker-ce docker-ce-cli containerd.io
 RUN pip3 install docker defusedxml netifaces
 
 # Download and build int-ball2_simulator
-RUN mkdir -p /home/nvidia/IB2
-WORKDIR /home/nvidia/IB2
-RUN git clone https://github.com/jaxa/int-ball2_simulator.git
-RUN cd /home/nvidia/IB2/int-ball2_simulator/Int-Ball2_platform_gse && \
-    /bin/bash -c "source /opt/ros/melodic/setup.bash; catkin_make"
-RUN apt-get install -y libpcl-dev ros-melodic-pcl-ros && \
-    cd /home/int-ball2_simulator/Int-Ball2_platform_simulator && \
-    /bin/bash -c "source /opt/ros/melodic/setup.bash; catkin_make –DWITH_PCA9685=OFF"
+RUN mkdir -p /home/nvidia
+WORKDIR /home/nvidia
+RUN git clone https://github.com/jaxa/int-ball2_simulator.git IB2
+
+RUN sed -i 's/^intball2_telecommand_target_ip:.*$/intball2_telecommand_target_ip: [127.0.0.1]/' /home/nvidia/IB2/Int-Ball2_platform_gse/src/ground_system/communication_software/config/params.yml
+RUN sed -i 's/^intball2_telecommand_target_port:.*$/intball2_telecommand_target_port: [23456]/' /home/nvidia/IB2/Int-Ball2_platform_gse/src/ground_system/communication_software/config/params.yml
+RUN sed -i 's/^intball2_telemetry_receive_port:.*$/intball2_telemetry_receive_port: 34567/' /home/nvidia/IB2/Int-Ball2_platform_gse/src/ground_system/communication_software/config/params.yml
+
+
 
 # Download int-ball2_platform_works repository
 WORKDIR /home/nvidia
 COPY platform_works /home/nvidia/platform_works
+
+RUN sed -i 's/<arg name="receive_port" default="[^"]*"/<arg name="receive_port" default="23456"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/flight_software/trans_communication/launch/bringup.launch
+RUN sed -i 's/<arg name="ocs_host" default="[^"]*"/<arg name="ocs_host" default="localhost"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/flight_software/trans_communication/launch/bringup.launch
+RUN sed -i 's/<arg name="ocs_port" default="[^"]*"/<arg name="ocs_port" default="34567"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/flight_software/trans_communication/launch/bringup.launch
+
+RUN sed -i 's/<arg name="container_ros_master_uri" default="[^"]*"/<arg name="container_ros_master_uri" default="http:\/\/localhost:11311"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/platform_sim/platform_sim_tools/launch/platform_manager_bringup.launch
+RUN sed -i 's/<arg name="host_ib2_workspace" default="[^"]*"/<arg name="host_ib2_workspace" default="\/home\/nvidia\/IB2"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/platform_sim/platform_sim_tools/launch/platform_manager_bringup.launch
+
+RUN cd /home/nvidia/IB2/Int-Ball2_platform_gse && \
+    /bin/bash -c "source /opt/ros/melodic/setup.bash; catkin_make"
+RUN sudo mkdir /var/log/ground_system && sudo chown $USER:$USER /var/log/ground_system
+RUN apt-get install -y libpcl-dev ros-melodic-pcl-ros && \
+    cd /home/nvidia/Int-Ball2_platform_simulator && \
+    /bin/bash -c "source /opt/ros/melodic/setup.bash; catkin_make –DWITH_PCA9685=OFF"
+
 
 # 初期化スクリプトの追加
 COPY init-container.sh /
