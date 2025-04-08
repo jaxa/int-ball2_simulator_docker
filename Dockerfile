@@ -118,9 +118,9 @@ RUN apt-get clean && apt-get update && \
     apt-get install -y wget git vim curl gnupg2 lsb-release iproute2
 
 # Prepare for Gazebo
-RUN sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
-RUN wget https://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
-RUN sudo apt-get update
+RUN sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
+RUN wget https://packages.osrfoundation.org/gazebo.key -O - | apt-key add -
+RUN apt-get update
 
 # Install Python3 packages
 RUN apt-get install -y python3 python3-pip
@@ -239,10 +239,10 @@ RUN sed -i 's/<arg name="host_ib2_workspace" default="[^"]*"/<arg name="host_ib2
 
 RUN cd /home/nvidia/IB2/Int-Ball2_platform_gse && \
     /bin/bash -c "source /opt/ros/melodic/setup.bash; catkin_make"
-RUN sudo mkdir /var/log/ground_system && sudo chown $USER:$USER /var/log/ground_system
+RUN mkdir /var/log/ground_system && chown $USER:$USER /var/log/ground_system
 RUN apt-get install -y libpcl-dev ros-melodic-pcl-ros && \
-    cd /home/nvidia/Int-Ball2_platform_simulator && \
-    /bin/bash -c "source /opt/ros/melodic/setup.bash; catkin_make –DWITH_PCA9685=OFF"
+    cd /home/nvidia/IB2/Int-Ball2_platform_simulator && \
+    /bin/bash -c "source /opt/ros/melodic/setup.bash; catkin_make -DWITH_PCA9685=OFF"
 
 
 # 初期化スクリプトの追加
