@@ -1,12 +1,11 @@
 # ステージ1: Qtをインストール
-FROM --platform=linux/amd64 ubuntu:18.04 as qt-builder
+FROM --platform=linux/amd64 ubuntu:18.04 AS qt-builder
 # 注: --platform フラグは Qt インストーラーが x86 専用のため必要
 
 # ビルド引数として認証情報を受け取る
 # 注: ビルド時のみ使用し、最終イメージには含まれない安全な方法
 ARG QT_EMAIL
 ARG QT_PASSWORD
-# hadolint ignore=DL3023
 
 # Qtインストールに必要な依存関係をインストール
 RUN apt-get update && apt-get install -y \
@@ -118,9 +117,9 @@ RUN apt-get clean && apt-get update && \
     apt-get install -y wget git vim curl gnupg2 lsb-release iproute2
 
 # Prepare for Gazebo
-#RUN sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
-#RUN wget https://packages.osrfoundation.org/gazebo.key -O - | apt-key add -
-#RUN apt-get update
+RUN sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
+RUN wget https://packages.osrfoundation.org/gazebo.key -O - | apt-key add -
+RUN apt-get update
 
 # Install Python3 packages
 RUN apt-get install -y python3 python3-pip
@@ -177,7 +176,7 @@ RUN apt-get install -y libasound2-dev libxcb-shm0-dev libxcb-xv0-dev \
                 libxcb-keysyms1-dev libxcb-randr0-dev libxcb-composite0-dev \
                 lua5.2 lua5.2-dev protobuf-compiler bison libdvbpsi-dev libpulse-dev
 RUN cd /usr/local/src && \
-    wget https://get.videolan.org/vlc/3.0.7.1/vlc-3.0.7.1.tar.xz && \
+    wget https://download.videolan.org/vlc/3.0.7.1/vlc-3.0.7.1.tar.xz && \
     tar Jxvf vlc-3.0.7.1.tar.xz && \
     cd /usr/local/src/vlc-3.0.7.1 && \
     cp ./share/vlc.appdata.xml.in.in ./share/vlc.appdata.xml && \
@@ -216,11 +215,10 @@ RUN apt-get install -y docker-ce docker-ce-cli containerd.io
 RUN pip3 install docker defusedxml netifaces
 
 # Download and build int-ball2_simulator
-#RUN mkdir -p /home/nvidia
-#WORKDIR /home/nvidia
-WORKDIR /home
-#RUN git clone https://github.com/jaxa/int-ball2_simulator.git IB2
-RUN git clone https://github.com/jaxa/int-ball2_simulator.git
+RUN mkdir -p /home/nvidia
+WORKDIR /home/nvidia
+#WORKDIR /home
+RUN git clone https://github.com/jaxa/int-ball2_simulator.git IB2
 
 #RUN sed -i 's/^intball2_telecommand_target_ip:.*$/intball2_telecommand_target_ip: [127.0.0.1]/' /home/nvidia/IB2/Int-Ball2_platform_gse/src/ground_system/communication_software/config/params.yml
 #RUN sed -i 's/^intball2_telecommand_target_port:.*$/intball2_telecommand_target_port: [23456]/' /home/nvidia/IB2/Int-Ball2_platform_gse/src/ground_system/communication_software/config/params.yml
@@ -229,8 +227,8 @@ RUN git clone https://github.com/jaxa/int-ball2_simulator.git
 
 
 # Download int-ball2_platform_works repository
-#WORKDIR /home/nvidia
-COPY platform_works /home/nvidia/platform_works
+WORKDIR /home/nvidia
+COPY platform_works /home/platform_works
 
 #RUN sed -i 's/<arg name="receive_port" default="[^"]*"/<arg name="receive_port" default="23456"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/flight_software/trans_communication/launch/bringup.launch
 #RUN sed -i 's/<arg name="ocs_host" default="[^"]*"/<arg name="ocs_host" default="localhost"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/flight_software/trans_communication/launch/bringup.launch
@@ -241,7 +239,7 @@ COPY platform_works /home/nvidia/platform_works
 
 RUN cd /home/nvidia/IB2/Int-Ball2_platform_gse && \
     /bin/bash -c "source /opt/ros/melodic/setup.bash; catkin_make"
-#RUN mkdir /var/log/ground_system && chown $USER:$USER /var/log/ground_system
+RUN mkdir /var/log/ground_system && chown $USER:$USER /var/log/ground_system
 RUN apt-get install -y libpcl-dev ros-melodic-pcl-ros && \
     cd /home/nvidia/IB2/Int-Ball2_platform_simulator && \
     /bin/bash -c "source /opt/ros/melodic/setup.bash; catkin_make -DWITH_PCA9685=OFF"
