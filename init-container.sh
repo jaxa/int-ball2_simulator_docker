@@ -82,3 +82,4 @@ else
   # 対話型シェルを起動
   exec /bin/bash
 fi
+

@@ -251,3 +251,4 @@ RUN chmod +x /init-container.sh
 
 # コンテナ起動時のデフォルトコマンド
 CMD ["/init-container.sh"]
+

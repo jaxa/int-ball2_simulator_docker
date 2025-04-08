@@ -130,3 +130,4 @@ echo -e "${GREEN}コンテナが正常に起動しました${NC}"
 if [ "$DETACH" = true ]; then
   echo "コンテナに接続するには: docker exec -it $CONTAINER_NAME bash"
 fi
+
