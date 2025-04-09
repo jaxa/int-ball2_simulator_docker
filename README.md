@@ -6,7 +6,8 @@
 
 Int-Ball2シミュレータとユーザープログラムを個別のDockerコンテナとして実行し、Docker Compose を用いて連携動作させます。ROS（Robot Operating System）を使用したマイクロ重力環境下でのユーザープログラムによるロボット動作をシミュレーションできます。
 
-**現在の検証環境**: Windows + Docker Desktop
+**現在の検証環境**: 
+* Windows11 + WSL2(Ubuntu24.04)
 
 ## Docker-in-Docker (DooD) アーキテクチャ
 
@@ -102,10 +103,13 @@ rosrun platform_sim_tools simulator_bringup.sh
 
 ## Windows環境での注意事項
 
-- Docker Desktopの設定で、「WSL Integration」が有効になっていることを確認してください。
-- GUIを表示するには、X11サーバー（VcXsrvなど）が必要です。
-- VcXsrvでは以下の設定をしてください。
-  - XLaunchを起動して次の設定をすること：Multiple windowsを選択、Start no clientを選択、Clipboard/Native opengl/Disable access controlにチェックを入れる、Additional parameters for VcXsrvの欄に、-wglを記入
+- WSL2上での実行を推奨します。
+- `Error response from daemon: unknown or invalid runtime name: nvidia`が出た場合は以下を実施してください。
+  - sudo apt install nvidia-container-toolkit
+  - sudo nvidia-ctk runtime configure --runtime=docker
+  - sudo systemctl restart docker
+  - docker info | grep -i runtime (チェックのため)
+
 
 ## Linux環境での注意事項（TODO）
 
