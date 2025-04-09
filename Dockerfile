@@ -218,7 +218,8 @@ RUN pip3 install docker defusedxml netifaces
 RUN mkdir -p /home/nvidia
 WORKDIR /home/nvidia
 #WORKDIR /home
-RUN git clone https://github.com/jaxa/int-ball2_simulator.git IB2
+#RUN git clone https://github.com/jaxa/int-ball2_simulator.git IB2
+COPY IB2 /home/nvidia/IB2
 
 #RUN sed -i 's/^intball2_telecommand_target_ip:.*$/intball2_telecommand_target_ip: [127.0.0.1]/' /home/nvidia/IB2/Int-Ball2_platform_gse/src/ground_system/communication_software/config/params.yml
 #RUN sed -i 's/^intball2_telecommand_target_port:.*$/intball2_telecommand_target_port: [23456]/' /home/nvidia/IB2/Int-Ball2_platform_gse/src/ground_system/communication_software/config/params.yml
@@ -228,7 +229,7 @@ RUN git clone https://github.com/jaxa/int-ball2_simulator.git IB2
 
 # Download int-ball2_platform_works repository
 WORKDIR /home/nvidia
-COPY platform_works /home/platform_works
+RUN git clone https://github.com/jaxa/int-ball2_platform_works.git platform_works
 
 #RUN sed -i 's/<arg name="receive_port" default="[^"]*"/<arg name="receive_port" default="23456"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/flight_software/trans_communication/launch/bringup.launch
 #RUN sed -i 's/<arg name="ocs_host" default="[^"]*"/<arg name="ocs_host" default="localhost"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/flight_software/trans_communication/launch/bringup.launch
