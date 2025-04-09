@@ -23,16 +23,9 @@ Int-Ball2シミュレータとユーザープログラムを個別のDockerコ�
 ### 1. リポジトリのクローンとサブモジュールの初期化
 
 ```bash
-# リポジトリのクローン
-git clone https://github.com/yourusername/int-ball2_sim_docker.git
-cd int-ball2_sim_docker
-
-# ユーザー制御プログラム（platform_works）をサブモジュールとして追加
-git submodule init
-git submodule update
-
-# または初回クローン時に一括実行
-# git clone --recursive https://github.com/yourusername/int-ball2_sim_docker.git
+# リポジトリのクローン(サブモジュールも含む)
+git clone --recursive https://github.com/jaxa/int-ball2_simulator_docker.git
+cd int-ball2_simulator_docker
 ```
 
 既にクローン済みのサブモジュールを最新版に更新する場合:
@@ -41,10 +34,12 @@ git submodule update
 git submodule update --remote
 ```
 
-このplatform_worksにユーザープログラムを用意してください。
+
 
 ### 2. ユーザープログラムの用意
-platform_works以下にユーザープログラムを用意します。このコードはシミュレータビルド時にも使用します。
+ユーザープログラムは、`int-ball2_simulator_docker/IB2/Int-Ball2_platform_simulator/src/user/`以下に配置してください。
+
+このコードはシミュレータビルド時に使用します。
 
 ### 3. シミュレータのDockerイメージビルド
 Qtをインストールするために、Qtのアカウント情報を用意してください。
@@ -56,11 +51,14 @@ Qtのアカウント名（メールアドレス）・パスワードを、QT_EMA
 docker build --build-arg QT_EMAIL=your.email@example.com --build-arg QT_PASSWORD=your_password -t ib2_simulator:latest .
 ```
 
-### 4. ユーザープログラムのDockerイメージビルド
-用意したユーザープログラムのDockerイメージをビルドします。
+### 4. platfor_worksのDockerイメージビルド
+platform_worksのDockerイメージをビルドします。
+
+任意の位置で実施して下さい。
 
 ```bash
 # ユーザープログラムイメージのビルド
+git clone https://github.com/jaxa/int-ball2_platform_works.git platform_works
 cd platform_works/platform_docker/template
 docker build -t ib2_user:0.1 .
 ```
@@ -69,6 +67,7 @@ docker build -t ib2_user:0.1 .
 
 ```bash
 # コンテナの起動
+cd int-ball2_simulator_docker
 docker-compose up -d
 
 # シミュレータコンテナのbashに接続
