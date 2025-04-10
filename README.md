@@ -105,10 +105,6 @@ rosrun platform_sim_tools simulator_bringup.sh
 
 - WSL2上での実行を推奨します。
 - `Error response from daemon: unknown or invalid runtime name: nvidia`が出た場合は以下を実施してください。
-  - sudo apt install nvidia-container-toolkit
-  - sudo nvidia-ctk runtime configure --runtime=docker
-  - sudo systemctl restart docker
-  - docker info | grep -i runtime (チェックのため)
     ```bash
     # NVIDIA GPG キーの追加
     distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
