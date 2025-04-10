@@ -7,7 +7,7 @@
 Int-Ball2シミュレータとユーザープログラムを個別のDockerコンテナとして実行し、Docker Compose を用いて連携動作させます。ROS（Robot Operating System）を使用したマイクロ重力環境下でのユーザープログラムによるロボット動作をシミュレーションできます。
 
 **現在の検証環境**: 
-* Windows11 + WSL2(Ubuntu24.04)
+* Windows11 + WSL2(Ubuntu22.04)
 
 ## Docker-in-Docker (DooD) アーキテクチャ
 
@@ -69,13 +69,13 @@ docker build -t ib2_user:0.1 .
 ```bash
 # コンテナの起動
 cd int-ball2_simulator_docker
-docker-compose up -d
+docker compose up -d
 
 # シミュレータコンテナのbashに接続
 docker exec -it ib2_simulator bash
 
 # コンテナの停止と削除
-docker-compose down
+docker compose down
 ```
 
 ## シミュレータコンテナ内の基本操作
@@ -109,7 +109,20 @@ rosrun platform_sim_tools simulator_bringup.sh
   - sudo nvidia-ctk runtime configure --runtime=docker
   - sudo systemctl restart docker
   - docker info | grep -i runtime (チェックのため)
+    ```bash
+    # NVIDIA GPG キーの追加
+    distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+    curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
 
+    # リポジトリの設定（Ubuntu 22.04用を使用）
+    curl -s -L https://nvidia.github.io/libnvidia-container/ubuntu22.04/libnvidia-container.list | \
+        sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+        sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+    sudo apt install nvidia-container-toolkit
+    sudo nvidia-ctk runtime configure --runtime=docker
+    sudo systemctl restart docker
+    docker info | grep -i runtime # チェックのため
+    ```
 
 ## Linux環境での注意事項（TODO）
 
