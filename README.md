@@ -25,20 +25,11 @@ Int-Ball2シミュレータとユーザープログラムを個別のDockerコ�
 
 ```bash
 # リポジトリのクローン(サブモジュールも含む)
-git clone --recursive https://github.com/jaxa/int-ball2_simulator_docker.git
-cd int-ball2_simulator_docker
+git clone https://github.com/jaxa/int-ball2_simulator_docker.git
 ```
-
-既にクローン済みのサブモジュールを最新版に更新する場合:
-
-```bash
-git submodule update --remote
-```
-
-
 
 ### 2. ユーザープログラムの用意
-ユーザープログラムは、`int-ball2_simulator_docker/IB2/Int-Ball2_platform_simulator/src/user/`以下に配置してください。
+ユーザープログラムは、`int-ball2_simulator_docker/ib2_user_ws/src/user/`以下に配置してください。
 
 このコードはシミュレータビルド時に使用します。
 
@@ -52,7 +43,20 @@ Qtのアカウント名（メールアドレス）・パスワードを、QT_EMA
 docker build --build-arg QT_EMAIL=your.email@example.com --build-arg QT_PASSWORD=your_password -t ib2_simulator:latest .
 ```
 
-### 4. platfor_worksのDockerイメージビルド
+### 4. Simulatorコンテナを使ったユーザープログラムのビルド
+前の手順でビルドしたib2_simulatorイメージを使用して、ホスト環境にあるユーザープログラムをビルドします。
+
+```bash
+docker run --rm \
+    -v $(pwd)/ib2_user_ws:/home/nvidia/ib2_user_ws \
+    ib2_simulator:latest \
+    bash -c "source /opt/ros/melodic/setup.bash && \
+    source /home/nvidia/IB2/Int-Ball2_platform_simulator/devel/setup.bash && \
+    cd /home/nvidia/ib2_user_ws && \
+    catkin_make"
+```
+
+### 5. platfor_worksのDockerイメージビルド
 platform_worksのDockerイメージをビルドします。
 
 任意の位置で実施して下さい。
@@ -64,7 +68,7 @@ cd platform_works/platform_docker/template
 docker build -t ib2_user:0.1 .
 ```
 
-### 4. Docker Composeによる実行
+### 6. Docker Composeによる実行
 
 ```bash
 # コンテナの起動
