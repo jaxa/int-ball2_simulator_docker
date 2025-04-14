@@ -40,7 +40,8 @@ Qtのアカウント名（メールアドレス）・パスワードを、QT_EMA
 
 ```bash
 # シミュレータイメージのビルド（初回は30分以上かかる場合があります）
-docker build --build-arg QT_EMAIL=your.email@example.com --build-arg QT_PASSWORD=your_password -t ib2_simulator:latest .
+cd int-ball2_simulator_docker
+docker build --build-arg HOST_USER_PATH=$(pwd) --build-arg QT_EMAIL=your.email@example.com --build-arg QT_PASSWORD=your_password -t ib2_simulator:latest .
 ```
 
 ### 4. Simulatorコンテナを使ったユーザープログラムのビルド

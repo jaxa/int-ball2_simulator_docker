@@ -6,6 +6,7 @@ FROM ubuntu:18.04 AS qt-builder
 # 注: ビルド時のみ使用し、最終イメージには含まれない安全な方法
 ARG QT_EMAIL
 ARG QT_PASSWORD
+ARG HOST_USER_PATH
 
 # Qtインストールに必要な依存関係をインストール
 RUN apt-get update && apt-get install -y \
@@ -231,7 +232,7 @@ RUN git clone https://github.com/jaxa/int-ball2_simulator.git IB2
 #RUN sed -i 's/<arg name="ocs_port" default="[^"]*"/<arg name="ocs_port" default="34567"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/flight_software/trans_communication/launch/bringup.launch
 
 RUN sed -i 's/<arg name="container_ros_master_uri" default="[^"]*"/<arg name="container_ros_master_uri" default="http:\/\/172.17.0.1:11311"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/platform_sim/platform_sim_tools/launch/platform_manager_bringup.launch
-RUN sed -i 's/<arg name="host_ib2_workspace" default="[^"]*"/<arg name="host_ib2_workspace" default="\/home\/jaxa\/int-ball2_simulator_docker\/ib2_user_ws"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/platform_sim/platform_sim_tools/launch/platform_manager_bringup.launch
+RUN sed -i 's/<arg name="host_ib2_workspace" default="[^"]*"/<arg name="host_ib2_workspace" default="'"$HOST_USER_PATH"'\/int-ball2_simulator_docker\/ib2_user_ws"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/platform_sim/platform_sim_tools/launch/platform_manager_bringup.launch
 
 
 # Download int-ball2_platform_works repository
