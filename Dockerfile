@@ -1,6 +1,6 @@
 # ステージ1: Qtをインストール
-FROM --platform=linux/amd64 ubuntu:18.04 AS qt-builder
-# 注: --platform フラグは Qt インストーラーが x86 専用のため必要
+FROM ubuntu:18.04 AS qt-builder
+# 注: Qt インストーラーはx86専用
 
 # ビルド引数として認証情報を受け取る
 # 注: ビルド時のみ使用し、最終イメージには含まれない安全な方法
@@ -110,8 +110,8 @@ RUN cd /opt/Qt && \
     rm -f qt-installer-nonintaractive.qs
 
 # ステージ2: 最終イメージの構築
-FROM --platform=linux/amd64 ubuntu:18.04
-# 注: --platform フラグは Qt インストーラーが x86 専用のため必要
+FROM ubuntu:18.04
+# 注: Qtインストーラーはx86専用
 
 RUN apt-get clean && apt-get update && \
     apt-get install -y wget git vim curl gnupg2 lsb-release iproute2
@@ -217,26 +217,27 @@ RUN pip3 install docker defusedxml netifaces
 # Download and build int-ball2_simulator
 RUN mkdir -p /home/nvidia
 WORKDIR /home/nvidia
-#WORKDIR /home
-#RUN git clone https://github.com/jaxa/int-ball2_simulator.git IB2
-COPY IB2 /home/nvidia/IB2
+RUN git clone https://github.com/jaxa/int-ball2_simulator.git IB2
 
+# パラメータ書き換え用
+## GSE
 #RUN sed -i 's/^intball2_telecommand_target_ip:.*$/intball2_telecommand_target_ip: [127.0.0.1]/' /home/nvidia/IB2/Int-Ball2_platform_gse/src/ground_system/communication_software/config/params.yml
 #RUN sed -i 's/^intball2_telecommand_target_port:.*$/intball2_telecommand_target_port: [23456]/' /home/nvidia/IB2/Int-Ball2_platform_gse/src/ground_system/communication_software/config/params.yml
 #RUN sed -i 's/^intball2_telemetry_receive_port:.*$/intball2_telemetry_receive_port: 34567/' /home/nvidia/IB2/Int-Ball2_platform_gse/src/ground_system/communication_software/config/params.yml
 
+## Simulator
+#RUN sed -i 's/<arg name="receive_port" default="[^"]*"/<arg name="receive_port" default="23456"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/flight_software/trans_communication/launch/bringup.launch
+#RUN sed -i 's/<arg name="ocs_host" default="[^"]*"/<arg name="ocs_host" default="localhost"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/flight_software/trans_communication/launch/bringup.launch
+#RUN sed -i 's/<arg name="ocs_port" default="[^"]*"/<arg name="ocs_port" default="34567"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/flight_software/trans_communication/launch/bringup.launch
+
+RUN sed -i 's/<arg name="container_ros_master_uri" default="[^"]*"/<arg name="container_ros_master_uri" default="http:\/\/172.17.0.1:11311"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/platform_sim/platform_sim_tools/launch/platform_manager_bringup.launch
+RUN sed -i 's/<arg name="host_ib2_workspace" default="[^"]*"/<arg name="host_ib2_workspace" default="\/home\/jaxa\/int-ball2_simulator_docker\/ib2_user_ws"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/platform_sim/platform_sim_tools/launch/platform_manager_bringup.launch
 
 
 # Download int-ball2_platform_works repository
 WORKDIR /home/nvidia
 RUN git clone https://github.com/jaxa/int-ball2_platform_works.git platform_works
 
-#RUN sed -i 's/<arg name="receive_port" default="[^"]*"/<arg name="receive_port" default="23456"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/flight_software/trans_communication/launch/bringup.launch
-#RUN sed -i 's/<arg name="ocs_host" default="[^"]*"/<arg name="ocs_host" default="localhost"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/flight_software/trans_communication/launch/bringup.launch
-#RUN sed -i 's/<arg name="ocs_port" default="[^"]*"/<arg name="ocs_port" default="34567"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/flight_software/trans_communication/launch/bringup.launch
-
-#RUN sed -i 's/<arg name="container_ros_master_uri" default="[^"]*"/<arg name="container_ros_master_uri" default="http:\/\/localhost:11311"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/platform_sim/platform_sim_tools/launch/platform_manager_bringup.launch
-#RUN sed -i 's/<arg name="host_ib2_workspace" default="[^"]*"/<arg name="host_ib2_workspace" default="\/home\/nvidia\/IB2"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/platform_sim/platform_sim_tools/launch/platform_manager_bringup.launch
 
 RUN cd /home/nvidia/IB2/Int-Ball2_platform_gse && \
     /bin/bash -c "source /opt/ros/melodic/setup.bash; catkin_make"

@@ -2,7 +2,7 @@ services:
   simulator:
     image: ib2_simulator:latest
     container_name: ib2_simulator
-    runtime: nvidia
+    # runtime: nvidia # GPU搭載環境でGPUを使いたい場合はビルドする前にアンコメント
     privileged: true
     network_mode: host
     ipc: host
@@ -21,10 +21,10 @@ services:
       - /run
       - /run/lock
     volumes: 
-      - ./shared_data:/home/shared_data:rw
+      - ./shared_data:/home/nvidia/shared_data:rw
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/.X11-unix:/tmp/.X11-unix  # X11ソケット
       - /run/user/${UID}:/run/user/${UID}  # WaylandソケットやDBusがここにあることも
       - /sys/fs/cgroup:/sys/fs/cgroup:ro  # systemd用のcgroupマウント
+      - ./ib2_user_ws:/home/nvidia/ib2_user_ws:rw
     command: /sbin/init # 初期化スクリプトを実行せず、systemdのみを起動
-
