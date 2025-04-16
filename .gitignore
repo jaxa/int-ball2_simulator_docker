@@ -32,3 +32,5 @@ node_modules/
 dist/
 
 shared_data/
+
+ib2_user_ws/

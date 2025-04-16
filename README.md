@@ -49,7 +49,7 @@ docker build --build-arg HOST_USER_PATH=$(pwd) --build-arg QT_EMAIL=your.email@e
 
 ```bash
 docker run --rm \
-    -v $(pwd)/ib2_user_ws:/home/nvidia/ib2_user_ws \
+    -v $(pwd)/ib2_user_ws:$(pwd)/ib2_user_ws \
     ib2_simulator:latest \
     bash -c "source /opt/ros/melodic/setup.bash && \
     source /home/nvidia/IB2/Int-Ball2_platform_simulator/devel/setup.bash && \
