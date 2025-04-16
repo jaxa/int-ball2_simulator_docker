@@ -22,7 +22,9 @@ RUN apt-get update && apt-get install -y \
 
 # Qtインストーラをダウンロード
 RUN mkdir -p /opt/Qt/install
-RUN cd /opt/Qt && wget https://download.qt.io/archive/qt/5.12/5.12.3/qt-opensource-linux-x64-5.12.3.run
+RUN cd /opt/Qt 
+RUN wget https://download.qt.io/archive/qt/5.12/5.12.3/qt-opensource-linux-x64-5.12.3.run
+# COPY qt-opensource-linux-x64-5.12.3.run ./
 
 # インストーラースクリプトを動的に生成
 RUN cd /opt/Qt && echo 'function Controller() { \

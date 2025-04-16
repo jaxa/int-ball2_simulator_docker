@@ -53,7 +53,7 @@ docker run --rm \
     ib2_simulator:latest \
     bash -c "source /opt/ros/melodic/setup.bash && \
     source /home/nvidia/IB2/Int-Ball2_platform_simulator/devel/setup.bash && \
-    cd /home/nvidia/ib2_user_ws && \
+    cd $(pwd)/ib2_user_ws && \
     catkin_make"
 ```
 
