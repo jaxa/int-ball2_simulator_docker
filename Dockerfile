@@ -6,7 +6,7 @@ FROM ubuntu:18.04 AS qt-builder
 # 注: ビルド時のみ使用し、最終イメージには含まれない安全な方法
 ARG QT_EMAIL
 ARG QT_PASSWORD
-ARG HOST_USER_PATH
+
 
 # Qtインストールに必要な依存関係をインストール
 RUN apt-get update && apt-get install -y \
@@ -115,6 +115,8 @@ RUN cd /opt/Qt && \
 # ステージ2: 最終イメージの構築
 FROM ubuntu:18.04
 # 注: Qtインストーラーはx86専用
+
+ARG HOST_USER_PATH
 
 RUN apt-get clean && apt-get update && \
     apt-get install -y wget git vim curl gnupg2 lsb-release iproute2
@@ -235,7 +237,6 @@ RUN git clone https://github.com/jaxa/int-ball2_simulator.git IB2
 
 RUN sed -i 's/<arg name="container_ros_master_uri" default="[^"]*"/<arg name="container_ros_master_uri" default="http:\/\/172.17.0.1:11311"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/platform_sim/platform_sim_tools/launch/platform_manager_bringup.launch
 RUN sed -i 's/<arg name="host_ib2_workspace" default="[^"]*"/<arg name="host_ib2_workspace" default="'"$HOST_USER_PATH"'\/ib2_user_ws"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/platform_sim/platform_sim_tools/launch/platform_manager_bringup.launch
-
 
 # Download int-ball2_platform_works repository
 WORKDIR /home/nvidia

@@ -23,10 +23,10 @@ Int-Ball2シミュレータとユーザープログラムを個別のDockerコ�
 
 ### 1. リポジトリのクローンとサブモジュールの初期化
 
-```bash
-# リポジトリのクローン(サブモジュールも含む)
-git clone https://github.com/jaxa/int-ball2_simulator_docker.git
-```
+  ```bash
+  # リポジトリのクローン(サブモジュールも含む)
+  git clone https://github.com/jaxa/int-ball2_simulator_docker.git
+  ```
 
 ### 2. ユーザープログラムの用意
 ユーザープログラムは、`int-ball2_simulator_docker/ib2_user_ws/src/user/`以下に配置してください。
@@ -38,73 +38,78 @@ Qtをインストールするために、Qtのアカウント情報を用意し�
 
 Qtのアカウント名（メールアドレス）・パスワードを、QT_EMAIL・QT_PASSWORDの引数として渡してください。
 
-```bash
-# シミュレータイメージのビルド（初回は30分以上かかる場合があります）
-cd int-ball2_simulator_docker
-docker build --build-arg HOST_USER_PATH=$(pwd) --build-arg QT_EMAIL=your.email@example.com --build-arg QT_PASSWORD=your_password -t ib2_simulator:latest .
-```
+  ```bash
+  # シミュレータイメージのビルド（初回は30分以上かかる場合があります）
+  cd int-ball2_simulator_docker
+  docker build --build-arg HOST_USER_PATH=$(pwd) \
+               --build-arg QT_EMAIL=your.email@example.com \
+               --build-arg QT_PASSWORD=your_password \
+               -t ib2_simulator:latest .
+  ```
 
 ### 4. Simulatorコンテナを使ったユーザープログラムのビルド
 前の手順でビルドしたib2_simulatorイメージを使用して、ホスト環境にあるユーザープログラムをビルドします。
 
-```bash
-docker run --rm \
-    -v $(pwd)/ib2_user_ws:$(pwd)/ib2_user_ws \
-    ib2_simulator:latest \
-    bash -c "source /opt/ros/melodic/setup.bash && \
-    source /home/nvidia/IB2/Int-Ball2_platform_simulator/devel/setup.bash && \
-    cd $(pwd)/ib2_user_ws && \
-    catkin_make"
-```
+（ユーザープログラムの更新のたびにこの手順を実行してください）
+
+  ```bash
+  docker run --rm \
+      -v $(pwd)/ib2_user_ws:$(pwd)/ib2_user_ws \
+      ib2_simulator:latest \
+      bash -c "source /opt/ros/melodic/setup.bash && \
+      source /home/nvidia/IB2/Int-Ball2_platform_simulator/devel/setup.bash && \
+      cd $(pwd)/ib2_user_ws && \
+      catkin_make"
+  ```
 
 ### 5. platfor_worksのDockerイメージビルド
 platform_worksのDockerイメージをビルドします。
 
 任意の位置で実施して下さい。
 
-```bash
-# ユーザープログラムイメージのビルド
-git clone https://github.com/jaxa/int-ball2_platform_works.git platform_works
-cd platform_works/platform_docker/template
-docker build -t ib2_user:0.1 .
-```
+  ```bash
+  # ユーザープログラムイメージのビルド
+  git clone https://github.com/jaxa/int-ball2_platform_works.git platform_works
+  cd platform_works/platform_docker/template
+  docker build -t ib2_user:0.1 .
+  ```
 
 ### 6. Docker Composeによる実行
 
-```bash
-# コンテナの起動
-cd int-ball2_simulator_docker
-docker compose up -d
+  ```bash
+  # コンテナの起動
+  cd int-ball2_simulator_docker
+  docker compose up -d
 
-# シミュレータコンテナのbashに接続
-docker exec -it ib2_simulator bash
+  # シミュレータコンテナのbashに接続
+  docker exec -it ib2_simulator bash
 
-# コンテナの停止と削除
-docker compose down
-```
+  # コンテナの停止と削除
+  # docker compose down
+   ```
 
 ## シミュレータコンテナ内の基本操作
 
 シミュレータコンテナに接続した後、ROSコマンドを実行できます:
 
-```bash
-docker exec -it ib2_simulator bash
+  ```bash
+  docker exec -it ib2_simulator bash
 
-# Docker内で実行
-source /opt/ros/melodic/setup.bash
-source /home/nvidia/IB2/Int-Ball2_platform_gse/devel/setup.bash
-roslaunch platform_gui bringup.launch
-```
+  # Docker内で実行
+  source /opt/ros/melodic/setup.bash
+  source /home/nvidia/IB2/Int-Ball2_platform_gse/devel/setup.bash
+  roslaunch platform_gui bringup.launch
+  ```
 
 別のターミナルで
-```bash
-docker exec -it ib2_simulator bash
+  ```bash
+  docker exec -it ib2_simulator bash
 
-# Docker内で実行
-source /opt/ros/melodic/setup.bash
-source /home/nvidia/IB2/Int-Ball2_platform_simulator/devel/setup.bash
-rosrun platform_sim_tools simulator_bringup.sh
-```
+  # Docker内で実行
+  source /opt/ros/melodic/setup.bash
+  source /home/nvidia/IB2/Int-Ball2_platform_simulator/devel/setup.bash
+  rosrun platform_sim_tools simulator_bringup.sh
+  ```
 
 ## Windows環境での注意事項
 
