@@ -24,7 +24,7 @@ RUN apt-get update && apt-get install -y \
 RUN mkdir -p /opt/Qt/install
 RUN cd /opt/Qt 
 RUN wget https://download.qt.io/archive/qt/5.12/5.12.3/qt-opensource-linux-x64-5.12.3.run
-# COPY qt-opensource-linux-x64-5.12.3.run ./
+# COPY qt-opensource-linux-x64-5.12.3.run /opt/Qt
 
 # インストーラースクリプトを動的に生成
 RUN cd /opt/Qt && echo 'function Controller() { \
@@ -236,7 +236,7 @@ RUN git clone https://github.com/jaxa/int-ball2_simulator.git IB2
 #RUN sed -i 's/<arg name="ocs_port" default="[^"]*"/<arg name="ocs_port" default="34567"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/flight_software/trans_communication/launch/bringup.launch
 
 RUN sed -i 's/<arg name="container_ros_master_uri" default="[^"]*"/<arg name="container_ros_master_uri" default="http:\/\/172.17.0.1:11311"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/platform_sim/platform_sim_tools/launch/platform_manager_bringup.launch
-RUN sed -i 's/<arg name="host_ib2_workspace" default="[^"]*"/<arg name="host_ib2_workspace" default="'"$HOST_USER_PATH"'\/ib2_user_ws"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/platform_sim/platform_sim_tools/launch/platform_manager_bringup.launch
+RUN sed -i 's#<arg name="host_ib2_workspace" default="[^"]*"#<arg name="host_ib2_workspace" default="'"$HOST_USER_PATH"'/ib2_user_ws"#' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/platform_sim/platform_sim_tools/launch/platform_manager_bringup.launch
 
 # Download int-ball2_platform_works repository
 WORKDIR /home/nvidia
