@@ -17,7 +17,6 @@
 
 ![Int‑Ball2 シミュレータ構成図](docs/architecture.mmd)
 
-
 1. **シミュレータコンテナ** からホストの Docker Engine を操作  
 2. `/var/run/docker.sock` を共有し **ユーザープログラムコンテナ** を生成・管理  
 3. GUI 表示は X11 / WSLg 経由でホストの画面へ出力  
@@ -57,11 +56,7 @@ mkdir -p shared_data_sim
 ### 4. シミュレータ Docker イメージのビルド
 
 ```bash
-docker build \
-  --build-arg HOST_USER_PATH="$(pwd)" \
-  --build-arg QT_EMAIL=your.email@example.com \
-  --build-arg QT_PASSWORD=your_password \
-  -t ib2_simulator:latest .
+docker build --build-arg HOST_USER_PATH="$(pwd)" --build-arg QT_EMAIL=your.email@example.com --build-arg QT_PASSWORD=your_password -t ib2_simulator:latest .
 ```
 
 > **注意**: 初回ビルドは 60 分以上かかる場合があります。
