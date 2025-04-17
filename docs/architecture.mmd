@@ -1,32 +1,25 @@
 %% Int‑Ball2 Simulator Architecture Diagram
 %% Render with GitHub or VS Code — Mermaid preview is supported
 
-flowchart TD
-    %% Host machine
-    subgraph host["Host Machine"]
-        engine["Docker Engine"]
-    end
+C4Context
+title Docker Int‑Ball2 Simulator Architecture
 
-    %% Simulator container (privileged)
-    subgraph sim["Simulator Container (ib2_simulator)"]
-        sim_ros["platform_gui(GSE)"]
-        sim_gui["platform_sim_tools(RViz+Gazebo)"]
-    end
+Enterprise_Boundary(host, "Host Environment") {
+    System(dockerService, "Docker Service", "Manages and runs containers")
+    System(userProgram, "User Program", "Program developed by users")
+    
+    Container_Boundary(simulatorContainer, "Simulator Container") {
+        Component(gse, "GSE", "Ground Support Equipment")
+        Component(rvizGazebo, "RViz+Gazebo", "Simulation environment")
+    }
+    
+    Container_Boundary(userProgramContainer, "User Program Container") {
+        Component(cmdsh, "cmd.sh", "Execution script")
+    }
+}
 
-    %% User‑program container (spawned via DooD)
-    subgraph user["User Program Container (ib2_user)"]
-        user_ros["ROS Nodes / User Control Logic"]
-    end
-
-    %% Connections
-    engine -- "/var/run/docker.sock mount" --> sim
-    sim -- "docker API" --> engine
-    sim_ros -- "docker run" --> user
-
-    sim_gui --> sim_ros
-
-    %% Shared volumes
-    host ---|"shared_data_sim volume"| sim
-
-
+Rel(gse, userProgramContainer, "Run", "Executes program")
+Rel(gse, rvizGazebo, "CMD", "Sends commands")
+Rel(rvizGazebo, gse, "TLM", "Sends telemetry")
+Rel(cmdsh, userProgram, "Run", "Executes program")
 
