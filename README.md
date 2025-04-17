@@ -1,13 +1,19 @@
 # Int‑Ball2 シミュレータ Docker 環境 🚀
 
-本リポジトリ **int‑ball2_simulator_docker** は、JAXA Int‑Ball2 シミュレータとユーザープログラム (制御ノード) を Docker イメージ化し、Docker Compose で連携動作させるための環境を提供します。  
-マイクロ重力環境下でのロボット挙動を手軽にシミュレーションできます。💫
+<p style="display: inline">
+  <img src="https://img.shields.io/badge/-Docker-1488C6.svg?logo=docker&style=flat">
+  <img src="https://img.shields.io/badge/ROS-darkblue?logo=ros">
+</p>
+
+
+ **int‑ball2_simulator_docker** は、[JAXA Int‑Ball2 シミュレータ](https://github.com/jaxa/int-ball2_simulator)とユーザープログラム (制御ノード) を Docker イメージ化し、Docker Compose で連携動作させるための環境を提供します。  
+マイクロ重力環境下での飛行ロボットの挙動を手軽にシミュレーションできます。💫
 
 ---
 
 ## 概要 / Overview ✨
 
-- **目的**: Int‑Ball2 シミュレータ + ユーザープログラムをワンコマンドで起動  
+- **目的**: Int‑Ball2 シミュレータ + ユーザープログラムを簡単なコマンドで起動  
 - **検証環境**: Windows 11 + WSL2 (Ubuntu 24.04)  
 - **主要技術**: Docker‑outside‑of‑Docker (DooD)、ROS、X11 / WSLg
 
@@ -15,40 +21,41 @@
 
 ## アーキテクチャ概要 🖼️
 
-```mermaid
-C4Context
-title Docker Int‑Ball2 Simulator Architecture
-
-Enterprise_Boundary(host, "Host Environment") {
-    System(dockerService, "Docker Service", "Manages and runs containers")
-    System(userProgram, "User Program", "Program developed by users")
+  ```mermaid
+  graph TB
+      subgraph HostEnvironment
+          dockerService["Docker Service"]
+          userProgram["User Program"]
+        
+          subgraph SimulatorContainer
+              gse["GSE"]
+              rvizGazebo["RViz+Gazebo"]
+          end
+        
+          subgraph UserProgramContainer
+              cmdsh["cmd.sh"]
+          end
+      end
     
-    Container_Boundary(simulatorContainer, "Simulator Container") {
-        Component(gse, "GSE", "Ground Support Equipment")
-        Component(rvizGazebo, "RViz+Gazebo", "Simulation environment")
-    }
-    
-    Container_Boundary(userProgramContainer, "User Program Container") {
-        Component(cmdsh, "cmd.sh", "Execution script")
-    }
-}
+      dockerService -- "Run" --> SimulatorContainer
+      gse -- "Docker Run" --> UserProgramContainer
+      gse <-- "CMD/TLM" --> rvizGazebo
+      cmdsh -- "Run" --> userProgram
+      userProgram -- "Control" --> rvizGazebo
+  ```
 
-Rel(gse, userProgramContainer, "Run", "Executes program")
-Rel(gse, rvizGazebo, "CMD", "Sends commands")
-Rel(rvizGazebo, gse, "TLM", "Sends telemetry")
-Rel(cmdsh, userProgram, "Run", "Executes program")
-```
-
-1. **シミュレータコンテナ** からホストの Docker Engine を操作  
-2. `/var/run/docker.sock` を共有し **ユーザープログラムコンテナ** を生成・管理  
+1. ホスト環境に、**シミュレータコンテナ** 、**ユーザープログラムコンテナ** 、**ユーザープログラム** を配置
+2. **シミュレータコンテナ** の GSE からホストの Docker Engine を操作し、**ユーザープログラムコンテナ**を起動  
+3. `/var/run/docker.sock` を共有し **ユーザープログラムコンテナ** を生成・管理
+4. **ユーザープログラムコンテナ** はホスト環境にあるユーザープログラムを起動し**シミュレータコンテナ** のInt-Ball2モデルを操作
 3. GUI 表示は X11 / WSLg 経由でホストの画面へ出力  
 
 ---
 
 ## 前提条件 / Prerequisites 📝
 
-- **Docker** と **Docker Compose** がインストール済み  
-- **Qt アカウント**（メールアドレス & パスワード）  
+- ホスト環境に**Docker** と **Docker Compose** がインストール済み  
+- [**Qt アカウント**](https://login.qt.io/login)（メールアドレス & パスワード）  
 - シミュレータ GUI 表示のための **X11/WSLg** 環境
 
 > **備考**: Qt ライセンス登録は無料です。  
@@ -57,14 +64,14 @@ Rel(cmdsh, userProgram, "Run", "Executes program")
 
 ## セットアップと実行手順 💻
 
-### 1. リポジトリのクローン
+### 1. このリポジトリのクローン
 
 ```bash
 git clone https://github.com/jaxa/int-ball2_simulator_docker.git
 cd int-ball2_simulator_docker
 ```
 
-### 2. 共有ディレクトリの作成
+### 2. ファイル共有ディレクトリの作成
 
 ```bash
 mkdir -p shared_data_sim
@@ -72,10 +79,10 @@ mkdir -p shared_data_sim
 
 ### 3. ユーザープログラムの配置
 
-ユーザープログラムの ROS パッケージを  
-`ib2_user_ws/src/user/` に配置します。サンプルを用意しても構いません。
+ユーザープログラムの ROS パッケージを`int-ball2_simulator_docker/ib2_user_ws/src/user/` に配置します。
 
 ### 4. シミュレータ Docker イメージのビルド
+**your.email@example.com** と **your_password** をQtアカウント情報で置き換えてください。
 
 ```bash
 docker build --build-arg HOST_USER_PATH="$(pwd)" --build-arg QT_EMAIL=your.email@example.com --build-arg QT_PASSWORD=your_password -t ib2_simulator:latest .
@@ -84,6 +91,7 @@ docker build --build-arg HOST_USER_PATH="$(pwd)" --build-arg QT_EMAIL=your.email
 > **注意**: 初回ビルドは 60 分以上かかる場合があります。
 
 ### 5. ユーザープログラムのビルド
+シミュレータコンテナのROSシステムを使用して、ホスト環境にあるユーザープログラムをビルドします。
 
 ```bash
 docker run --rm \
@@ -95,6 +103,7 @@ docker run --rm \
 ```
 
 ### 6. platform_works イメージのビルド
+ユーザープログラムイメージをビルドします。
 
 ```bash
 git clone https://github.com/jaxa/int-ball2_platform_works.git platform_works
@@ -103,7 +112,7 @@ docker build -t ib2_user:0.1 .
 cd -
 ```
 
-### 7. Docker Compose で起動
+### 7. Docker Compose シミュレータコンテナを起動
 
 ```bash
 # シミュレータ & ユーザープログラムをバックグラウンド起動
@@ -117,15 +126,17 @@ docker exec -it ib2_simulator bash
 
 ## シミュレータの実行手順 🕹️
 
-### ターミナル 1: GUI 起動
+### ターミナル 1: GSE 起動
 
 ```bash
+# コンテナ内
 source /opt/ros/melodic/setup.bash
 source /home/nvidia/IB2/Int-Ball2_platform_gse/devel/setup.bash
 roslaunch platform_gui bringup.launch
 ```
 
 ### ターミナル 2: シミュレータ起動
+別のターミナルで以下を実行
 
 ```bash
 docker exec -it ib2_simulator bash
