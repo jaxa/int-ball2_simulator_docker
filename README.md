@@ -15,7 +15,29 @@
 
 ## アーキテクチャ概要 🖼️
 
-![Int‑Ball2 シミュレータ構成図](docs/architecture.mmd)
+```mermaid
+C4Context
+title Docker Int‑Ball2 Simulator Architecture
+
+Enterprise_Boundary(host, "Host Environment") {
+    System(dockerService, "Docker Service", "Manages and runs containers")
+    System(userProgram, "User Program", "Program developed by users")
+    
+    Container_Boundary(simulatorContainer, "Simulator Container") {
+        Component(gse, "GSE", "Ground Support Equipment")
+        Component(rvizGazebo, "RViz+Gazebo", "Simulation environment")
+    }
+    
+    Container_Boundary(userProgramContainer, "User Program Container") {
+        Component(cmdsh, "cmd.sh", "Execution script")
+    }
+}
+
+Rel(gse, userProgramContainer, "Run", "Executes program")
+Rel(gse, rvizGazebo, "CMD", "Sends commands")
+Rel(rvizGazebo, gse, "TLM", "Sends telemetry")
+Rel(cmdsh, userProgram, "Run", "Executes program")
+```
 
 1. **シミュレータコンテナ** からホストの Docker Engine を操作  
 2. `/var/run/docker.sock` を共有し **ユーザープログラムコンテナ** を生成・管理  
