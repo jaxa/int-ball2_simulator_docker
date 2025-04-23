@@ -22,8 +22,8 @@ RUN apt-get update && apt-get install -y \
 
 # Qtインストーラをダウンロード
 RUN mkdir -p /opt/Qt/install
-RUN cd /opt/Qt 
-RUN wget https://download.qt.io/archive/qt/5.12/5.12.3/qt-opensource-linux-x64-5.12.3.run
+RUN cd /opt/Qt &&\ 
+    wget https://download.qt.io/archive/qt/5.12/5.12.3/qt-opensource-linux-x64-5.12.3.run
 # COPY qt-opensource-linux-x64-5.12.3.run /opt/Qt
 
 # インストーラースクリプトを動的に生成
@@ -149,12 +149,13 @@ RUN apt-get install -y ros-melodic-gazebo-*
 RUN sed -i '/ROS_PYTHON_VERSION/s/^/#/; /ROS_PYTHON_VERSION/a export ROS_PYTHON_VERSION=3' /opt/ros/melodic/etc/catkin/profile.d/1.ros_python_version.sh
 
 # Install Netwide Assembler (NASM)
-RUN cd /usr/local/src && \
-    wget https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/nasm-2.15.05.tar.gz && \
-    tar zxvf nasm-2.15.05.tar.gz && \
-    cd nasm-2.15.05 && \
-    ./configure && \
-    make install
+# RUN cd /usr/local/src && \
+#     wget https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/nasm-2.15.05.tar.gz && \
+#     tar zxvf nasm-2.15.05.tar.gz && \
+#     cd nasm-2.15.05 && \
+#     ./configure && \
+#     make install
+RUN apt-get install -y nasm
 
 # Install Video Reception Environment
 RUN git clone https://code.videolan.org/videolan/x264.git /usr/local/src/x264-master && \
@@ -237,11 +238,6 @@ RUN git clone https://github.com/jaxa/int-ball2_simulator.git IB2
 
 RUN sed -i 's/<arg name="container_ros_master_uri" default="[^"]*"/<arg name="container_ros_master_uri" default="http:\/\/172.17.0.1:11311"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/platform_sim/platform_sim_tools/launch/platform_manager_bringup.launch
 RUN sed -i 's#<arg name="host_ib2_workspace" default="[^"]*"#<arg name="host_ib2_workspace" default="'"$HOST_USER_PATH"'/ib2_user_ws"#' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/platform_sim/platform_sim_tools/launch/platform_manager_bringup.launch
-
-# Download int-ball2_platform_works repository
-WORKDIR /home/nvidia
-RUN git clone https://github.com/jaxa/int-ball2_platform_works.git platform_works
-
 
 RUN cd /home/nvidia/IB2/Int-Ball2_platform_gse && \
     /bin/bash -c "source /opt/ros/melodic/setup.bash; catkin_make"

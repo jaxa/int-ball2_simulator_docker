@@ -7,7 +7,9 @@ services:
     network_mode: host
     ipc: host
     environment:
-      - DISPLAY=:0
+      - DISPLAY # ホストのDISPLAY環境変数の値を反映する
+      # - NVIDIA_VISIBLE_DEVICES=all
+      # - NVIDIA_DRIVER_CAPABILITIES=all
       - LIBGL_ALWAYS_INDIRECT=0  # WSLgでは直接描画が可能な場合が多い
       - QT_X11_NO_MITSHM=1
       - MESA_GL_VERSION_OVERRIDE=3.3
@@ -25,6 +27,4 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/.X11-unix:/tmp/.X11-unix  # X11ソケット
       - /run/user/${UID}:/run/user/${UID}  # WaylandソケットやDBusがここにあることも
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro  # systemd用のcgroupマウント
-      - ./ib2_user_ws:/home/nvidia/ib2_user_ws:rw
     command: /sbin/init # 初期化スクリプトを実行せず、systemdのみを起動
