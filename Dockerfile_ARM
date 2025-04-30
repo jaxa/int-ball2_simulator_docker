@@ -1,5 +1,6 @@
-# ステージ1: Qtをソースからビルド
+# ステージ1: Qtをインストール
 FROM ubuntu:18.04 AS qt-builder
+# 注: Qt インストーラーはx86専用
 
 # 必要なビルドツールをインストール
 RUN apt-get update && apt-get install -y \
@@ -32,7 +33,6 @@ RUN apt-get update && apt-get install -y \
     libxcb-xkb-dev \
     libxkbcommon-x11-dev
 
-# Qt ソースコードのダウンロード（特定のタグを指定）
 WORKDIR /opt/Qt
 RUN git clone https://github.com/qt/qt5.git --branch v5.12.3 --depth 1
 WORKDIR /opt/Qt/qt5
@@ -40,8 +40,6 @@ WORKDIR /opt/Qt/qt5
 # サブモジュールの初期化とアップデート（必要なモジュールのみを取得）
 RUN ./init-repository --module-subset=essential,qtbase,qtdeclarative,qtgraphicaleffects,qtquickcontrols,qtquickcontrols2,qtsvg,qttools,qttranslations
 
-# Qt のビルド設定とコンパイル
-# ここでは最小限の必要なコンポーネントのみを有効化
 RUN ./configure -prefix /opt/Qt/install \
     -release \
     -opensource \
@@ -60,9 +58,8 @@ RUN ./configure -prefix /opt/Qt/install \
 # ビルド（マルチコアを使用して高速化）
 RUN make -j$(nproc)
 RUN make install
-
-# シンボリックリンクの作成
 RUN ln -s /opt/Qt/install /opt/Qt/5
+
 
 # ステージ2: 最終イメージの構築
 FROM ubuntu:18.04
