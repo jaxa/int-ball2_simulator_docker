@@ -173,20 +173,21 @@ docker compose restart        # 必要に応じて
 - `docker-compose.yml` の環境変数は既定で以下を設定  
   ```yaml
   environment:
-    - DISPLAY=:0
+    - DISPLAY
+    # - NVIDIA_VISIBLE_DEVICES=all
+    # - NVIDIA_DRIVER_CAPABILITIES=all
     - LIBGL_ALWAYS_INDIRECT=0
     - QT_X11_NO_MITSHM=1
     - MESA_GL_VERSION_OVERRIDE=3.3
   ```
-- NVIDIA GPU を利用したい場合は `runtime: nvidia` のコメントを外してください。
+- NVIDIA GPU を利用したい場合は `runtime: nvidia`、`NVIDIA_VISIBLE_DEVICES=all`、`NVIDIA_DRIVER_CAPABILITIES=all` のコメントを外してください。
 
 ### Linux
 
-- X11 許可:
+- ib2_simulatorコンテナを立ち上げるターミナルで以下を入力し、X11へのアクセスを許可しておく。
   ```bash
   xhost +local:docker
   ```
-- `DISPLAY=:0` (または Wayland 環境に応じた値) を設定してください。
 
 ---
 
