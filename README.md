@@ -116,6 +116,7 @@ cd -
 
 ```bash
 # シミュレータ & ユーザープログラムをバックグラウンド起動
+cd int-ball2_simulator_docker
 docker compose up -d
 
 # シミュレータコンテナに入る場合
