@@ -109,7 +109,6 @@ docker run --rm \
 git clone https://github.com/jaxa/int-ball2_platform_works.git platform_works
 cd platform_works/platform_docker/template
 docker build -t ib2_user:0.1 .
-cd -
 ```
 
 ### 7. Docker Compose シミュレータコンテナを起動
