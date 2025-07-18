@@ -67,6 +67,7 @@
 ### 1. このリポジトリのクローン
 
 ```bash
+cd ~ # 任意
 git clone https://github.com/jaxa/int-ball2_simulator_docker.git
 cd int-ball2_simulator_docker
 ```
@@ -82,10 +83,19 @@ mkdir -p shared_data_sim
 ユーザープログラムの ROS パッケージを`int-ball2_simulator_docker/ib2_user_ws/src/user/` に配置します。
 
 ### 4. シミュレータ Docker イメージのビルド
-**your.email@example.com** と **your_password** をQtアカウント情報で置き換えてください。
+コマンド実行前に、`your.email@example.com` と `your_password` をあなたのQtアカウント情報で置き換えてください。
 
 ```bash
 docker build --build-arg HOST_USER_PATH="$(pwd)" --build-arg QT_EMAIL=your.email@example.com --build-arg QT_PASSWORD=your_password -t ib2_simulator:latest .
+```
+
+**(オプション)**
+
+ビルド済みイメージの利用も可能です。（ただしそのままでは、ユーザー名「nvidia」かつ「~/int-ball2_simulator_docker」のディレクトリ構造を要求します）
+
+```bash
+docker pull ghcr.io/jaxa/ib2_simulator:latest
+docker tag ghcr.io/jaxa/ib2_simulator:latest ib2_simulator:latest # 以降の説明と合わせる場合
 ```
 
 > **注意**: 初回ビルドは 60 分以上かかる場合があります。
@@ -94,6 +104,7 @@ docker build --build-arg HOST_USER_PATH="$(pwd)" --build-arg QT_EMAIL=your.email
 シミュレータコンテナのROSシステムを使用して、ホスト環境にあるユーザープログラムをビルドします。
 
 ```bash
+cd ~/int-ball2_simulator_docker # 任意
 docker run --rm \
   -v "$(pwd)/ib2_user_ws:$(pwd)/ib2_user_ws" \
   ib2_simulator:latest \
@@ -106,6 +117,7 @@ docker run --rm \
 ユーザープログラムイメージをビルドします。
 
 ```bash
+cd ~ # 任意
 git clone https://github.com/jaxa/int-ball2_platform_works.git platform_works
 cd platform_works/platform_docker/template
 docker build -t ib2_user:0.1 .
@@ -128,8 +140,10 @@ docker exec -it ib2_simulator bash
 
 ### ターミナル 1: GSE 起動
 
+上記7の続きから、
+
 ```bash
-# コンテナ内
+# ib2_simulatorコンテナ内で
 source /opt/ros/melodic/setup.bash
 source /home/nvidia/IB2/Int-Ball2_platform_gse/devel/setup.bash
 roslaunch platform_gui bringup.launch
