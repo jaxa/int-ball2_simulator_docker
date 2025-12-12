@@ -23,6 +23,7 @@ services:
       - /run
       - /run/lock
     volumes: 
+      - ${PWD}/ib2_user_ws:${PWD}/ib2_user_ws
       - ./shared_data_sim:/home/nvidia/shared_data_sim:rw
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/.X11-unix:/tmp/.X11-unix  # X11ソケット
