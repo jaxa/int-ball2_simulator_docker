@@ -128,7 +128,7 @@ docker build -t ib2_user:0.1 .
 ```bash
 # シミュレータ & ユーザープログラムをバックグラウンド起動
 cd int-ball2_simulator_docker
-PDW=$(pwd) docker compose up -d
+PWD=$(pwd) docker compose up -d
 
 # シミュレータコンテナに入る場合
 docker exec -it ib2_simulator bash
@@ -174,7 +174,7 @@ docker run --rm \
   bash -c "source /opt/ros/melodic/setup.bash && \
            source /home/nvidia/IB2/Int-Ball2_platform_simulator/devel/setup.bash && \
            cd $(pwd)/ib2_user_ws && catkin_make"
-PDW=$(pwd) docker compose restart        # 必要に応じて
+PWD=$(pwd) docker compose restart        # 必要に応じて
 ```
 
 ---
