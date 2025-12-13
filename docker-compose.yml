@@ -2,7 +2,7 @@ services:
   simulator:
     image: ib2_simulator:latest
     container_name: ib2_simulator
-    # runtime: nvidia # GPU搭載環境でGPUを使いたい場合はビルドする前にアンコメント
+    # gpus: all　 # GPU搭載環境でGPUを使いたい場合はビルドする前にアンコメント
     privileged: true
     network_mode: host
     ipc: host
