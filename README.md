@@ -14,7 +14,7 @@
 ## 概要 / Overview ✨
 
 - **目的**: Int‑Ball2 シミュレータ + ユーザープログラムを簡単なコマンドで起動  
-- **検証環境**: Windows 11 + WSL2 (Ubuntu 24.04) ，Ubuntu 24.04
+- **検証環境**: Windows 11 + WSL2 (Ubuntu 24.04) 、Ubuntu 24.04
 - **主要技術**: Docker‑outside‑of‑Docker (DooD)、ROS、X11 / WSLg
 
 ---
@@ -153,7 +153,7 @@ roslaunch platform_gui bringup.launch
 コンテナのターミナルの新規タブで以下を実行
 
 > [!TIP]
-> コンテナ内部のターミナル（Terminator）は以下の操作で新規シェルを表示できます．
+> コンテナ内部のターミナル（Terminator）は以下の操作で新規シェルを表示できます。
 > 
 > ---
 > 
@@ -208,8 +208,6 @@ PWD=$(pwd) docker compose restart        # 必要に応じて
   ```yaml
   environment:
     - DISPLAY
-    # - NVIDIA_VISIBLE_DEVICES=all
-    # - NVIDIA_DRIVER_CAPABILITIES=all
     - LIBGL_ALWAYS_INDIRECT=0
     - QT_X11_NO_MITSHM=1
     - MESA_GL_VERSION_OVERRIDE=3.3
@@ -225,15 +223,15 @@ PWD=$(pwd) docker compose restart        # 必要に応じて
 ### GPU の有効と無効
 
 > [!WARNING]
-> 以下の作業は Nvidia GPU が搭載されており，Linux 環境の場合は [nvidia-container-toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) のインストールが必須です．
+> 以下の作業は Nvidia GPU が搭載されており、Linux 環境の場合は [nvidia-container-toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) のインストールが必須です。
 
-- Nvidia 製 GPU を利用してシミュレーターを起動したい場合は `docker-compose.yaml` のコメントアウトされている `#<<: *enable_gpu` を有効にします．
+- Nvidia 製 GPU を利用してシミュレーターを起動したい場合は `docker-compose.yaml` のコメントアウトされている `#<<: *enable_gpu` を有効にします。
     ```diff
     - #<<: *enable_gpu
     + <<: *enable_gpu
     ```
 
-- 変更後コンテナを再起動して，コンテナ内で以下のコマンドが利用可能であることを確認します．
+- 変更後コンテナを再起動して、コンテナ内で以下のコマンドが利用可能であることを確認します。
     ```bash
     nvidia-smi
     ```
