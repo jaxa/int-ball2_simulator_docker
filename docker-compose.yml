@@ -1,15 +1,28 @@
+# GPU を有効にする変数
+x-enable_gpu: &enable_gpu
+  environment:
+    - NVIDIA_VISIBLE_DEVICES=all
+    - NVIDIA_DRIVER_CAPABILITIES=all
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - driver: nvidia
+            count: 1
+            capabilities: [gpu]
+
+
 services:
   simulator:
     image: ib2_simulator:latest
     container_name: ib2_simulator
-    # gpus: all　 # GPU搭載環境でGPUを使いたい場合はビルドする前にアンコメント
     privileged: true
     network_mode: host
     ipc: host
+    # GPU を有効にする場合コメントアウト
+    #<<: *enable_gpu
     environment:
       - DISPLAY # ホストのDISPLAY環境変数の値を反映する
-      # - NVIDIA_VISIBLE_DEVICES=all
-      # - NVIDIA_DRIVER_CAPABILITIES=all
       - LIBGL_ALWAYS_INDIRECT=0  # WSLgでは直接描画が可能な場合が多い
       - QT_X11_NO_MITSHM=1
       - MESA_GL_VERSION_OVERRIDE=3.3
