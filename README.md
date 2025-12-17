@@ -14,7 +14,7 @@
 ## 概要 / Overview ✨
 
 - **目的**: Int‑Ball2 シミュレータ + ユーザープログラムを簡単なコマンドで起動  
-- **検証環境**: Windows 11 + WSL2 (Ubuntu 24.04)  
+- **検証環境**: Windows 11 + WSL2 (Ubuntu 24.04) 、Ubuntu 24.04
 - **主要技術**: Docker‑outside‑of‑Docker (DooD)、ROS、X11 / WSLg
 
 ---
@@ -129,9 +129,10 @@ docker build -t ib2_user:0.1 .
 # シミュレータ & ユーザープログラムをバックグラウンド起動
 cd int-ball2_simulator_docker
 PWD=$(pwd) docker compose up -d
-
-# シミュレータコンテナに入る場合
-docker exec -it ib2_simulator bash
+```
+```
+# シミュレータコンテナのターミナルを表示する
+docker exec -it ib2_simulator bash -ic "dbus-launch terminator"
 ```
 
 ---
@@ -144,20 +145,39 @@ docker exec -it ib2_simulator bash
 
 ```bash
 # ib2_simulatorコンテナ内で
-source /opt/ros/melodic/setup.bash
 source /home/nvidia/IB2/Int-Ball2_platform_gse/devel/setup.bash
 roslaunch platform_gui bringup.launch
 ```
 
 ### ターミナル 2: シミュレータ起動
-別のターミナルで以下を実行
+コンテナのターミナルの新規タブで以下を実行
+
+> [!TIP]
+> コンテナ内部のターミナル（Terminator）は以下の操作で新規シェルを表示できます。
+> 
+> ---
+> 
+> 新規タブを開く
+> ```
+> Control + Shit T
+> ```
+> 
+> ---
+> 
+> 新規シェルを側面に追加
+> ```
+> Control + Shit E
+> ```
+> 
+> ---
+> 
+> 新規シェルを縦に追加
+> ```
+> Control + Shit O
+> ```
 
 ```bash
-docker exec -it ib2_simulator bash
-
 # コンテナ内
-source /opt/ros/melodic/setup.bash
-source /home/nvidia/IB2/Int-Ball2_platform_simulator/devel/setup.bash
 rosrun platform_sim_tools simulator_bringup.sh
 ```
 
@@ -188,13 +208,10 @@ PWD=$(pwd) docker compose restart        # 必要に応じて
   ```yaml
   environment:
     - DISPLAY
-    # - NVIDIA_VISIBLE_DEVICES=all
-    # - NVIDIA_DRIVER_CAPABILITIES=all
     - LIBGL_ALWAYS_INDIRECT=0
     - QT_X11_NO_MITSHM=1
     - MESA_GL_VERSION_OVERRIDE=3.3
   ```
-- NVIDIA GPU を利用したい場合は `runtime: nvidia`、`NVIDIA_VISIBLE_DEVICES=all`、`NVIDIA_DRIVER_CAPABILITIES=all` のコメントを外してください。
 
 ### Linux
 
@@ -202,6 +219,22 @@ PWD=$(pwd) docker compose restart        # 必要に応じて
   ```bash
   xhost +local:docker
   ```
+
+### GPU の有効と無効
+
+> [!WARNING]
+> 以下の作業は Nvidia GPU が搭載されており、Linux 環境の場合は [nvidia-container-toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) のインストールが必須です。
+
+- Nvidia 製 GPU を利用してシミュレーターを起動したい場合は `docker-compose.yaml` のコメントアウトされている `#<<: *enable_gpu` を有効にします。
+    ```diff
+    - #<<: *enable_gpu
+    + <<: *enable_gpu
+    ```
+
+- 変更後コンテナを再起動して、コンテナ内で以下のコマンドが利用可能であることを確認します。
+    ```bash
+    nvidia-smi
+    ```
 
 ---
 
