@@ -199,6 +199,21 @@ RUN apt-get install -y libpcl-dev ros-melodic-pcl-ros && \
     cd /home/nvidia/IB2/Int-Ball2_platform_simulator && \
     /bin/bash -c "source /opt/ros/melodic/setup.bash; catkin_make -DWITH_PCA9685=OFF"
 
+# terminator & clean caches
+COPY terminator_config /root/.config/terminator/config
+RUN apt-get install -y terminator dbus-x11 && rm -rf /var/lib/apt/lists/*
+
+# PS1 ROS setup
+RUN /bin/bash -c \
+        "echo \"export PS1='\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\e[1;37m\]\u\[\e[0m\]@\h:\[\e[1;36m\]\w\[\e[1;33m\]\$\[\e[0m\] '\" >> ~/.bashrc" &&\
+    /bin/bash -c \
+        "echo \"source /opt/ros/melodic/setup.bash\" >> ~/.bashrc" &&\
+    /bin/bash -c \
+        "echo \"source /home/nvidia/IB2/Int-Ball2_platform_simulator/devel/setup.bash\" >> ~/.bashrc"
+
+#    /bin/bash -c \
+#        "echo \"source /home/nvidia/IB2/Int-Ball2_platform_gse/devel/setup.bash\" >> ~/.bashrc" &&\
+
 
 # 初期化スクリプトの追加
 COPY init-container.sh /
