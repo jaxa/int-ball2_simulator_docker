@@ -51,7 +51,7 @@ else
 fi
 
 # ROS環境変数の設定
-source /opt/ros/melodic/setup.bash
+source /opt/ros/noetic/setup.bash
 if [ -f "/home/int-ball2_simulator/Int-Ball2_platform_gse/devel/setup.bash" ]; then
   source /home/int-ball2_simulator/Int-Ball2_platform_gse/devel/setup.bash
 fi
@@ -77,7 +77,7 @@ if [ $# -gt 0 ]; then
   exec "$@"
 else
   # .bashrcにROSの設定を追加
-  grep -q "source /opt/ros/melodic/setup.bash" ~/.bashrc || echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
+  grep -q "source /opt/ros/noetic/setup.bash" ~/.bashrc || echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
   
   # 対話型シェルを起動
   exec /bin/bash

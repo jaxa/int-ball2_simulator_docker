@@ -85,17 +85,17 @@ RUN pip3 install psutil
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata
 ENV TZ=Asia/Tokyo
 
-# Install ROS Melodic
+# Install ROS Noetic
 RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 RUN curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add -
 RUN apt-get update
-RUN apt-get -y install ros-melodic-desktop-full
+RUN apt-get -y install ros-noetic-desktop-full
 RUN apt-get -y install python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential
 
 # Install gazebo packages
-RUN apt-get install -y ros-melodic-gazebo-*
+RUN apt-get install -y ros-noetic-gazebo-*
 
-RUN sed -i '/ROS_PYTHON_VERSION/s/^/#/; /ROS_PYTHON_VERSION/a export ROS_PYTHON_VERSION=3' /opt/ros/melodic/etc/catkin/profile.d/1.ros_python_version.sh
+RUN sed -i '/ROS_PYTHON_VERSION/s/^/#/; /ROS_PYTHON_VERSION/a export ROS_PYTHON_VERSION=3' /opt/ros/noetic/etc/catkin/profile.d/1.ros_python_version.sh
 
 # Install Netwide Assembler (NASM)
 RUN cd /usr/local/src && \
@@ -193,11 +193,11 @@ RUN git clone https://github.com/jaxa/int-ball2_platform_works.git platform_work
 
 
 RUN cd /home/nvidia/IB2/Int-Ball2_platform_gse && \
-    /bin/bash -c "source /opt/ros/melodic/setup.bash; catkin_make"
+    /bin/bash -c "source /opt/ros/noetic/setup.bash; catkin_make"
 RUN mkdir /var/log/ground_system && chown $USER:$USER /var/log/ground_system
-RUN apt-get install -y libpcl-dev ros-melodic-pcl-ros && \
+RUN apt-get install -y libpcl-dev ros-noetic-pcl-ros && \
     cd /home/nvidia/IB2/Int-Ball2_platform_simulator && \
-    /bin/bash -c "source /opt/ros/melodic/setup.bash; catkin_make -DWITH_PCA9685=OFF"
+    /bin/bash -c "source /opt/ros/noetic/setup.bash; catkin_make -DWITH_PCA9685=OFF"
 
 
 # 初期化スクリプトの追加
