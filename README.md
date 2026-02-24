@@ -108,7 +108,7 @@ cd ~/int-ball2_simulator_docker # 任意
 docker run --rm \
   -v "$(pwd)/ib2_user_ws:$(pwd)/ib2_user_ws" \
   ib2_simulator:latest \
-  bash -c "source /opt/ros/melodic/setup.bash && \
+  bash -c "source /opt/ros/noetic/setup.bash && \
            source /home/nvidia/IB2/Int-Ball2_platform_simulator/devel/setup.bash && \
            cd $(pwd)/ib2_user_ws && catkin_make"
 ```
@@ -118,7 +118,7 @@ docker run --rm \
 
 ```bash
 cd ~ # 任意
-git clone https://github.com/jaxa/int-ball2_platform_works.git platform_works
+git clone -b noetic https://github.com/jaxa/int-ball2_platform_works.git platform_works
 cd platform_works/platform_docker/template
 docker build -t ib2_user:0.1 .
 ```
@@ -144,7 +144,7 @@ docker exec -it ib2_simulator bash
 
 ```bash
 # ib2_simulatorコンテナ内で
-source /opt/ros/melodic/setup.bash
+source /opt/ros/noetic/setup.bash
 source /home/nvidia/IB2/Int-Ball2_platform_gse/devel/setup.bash
 roslaunch platform_gui bringup.launch
 ```
@@ -156,7 +156,7 @@ roslaunch platform_gui bringup.launch
 docker exec -it ib2_simulator bash
 
 # コンテナ内
-source /opt/ros/melodic/setup.bash
+source /opt/ros/noetic/setup.bash
 source /home/nvidia/IB2/Int-Ball2_platform_simulator/devel/setup.bash
 rosrun platform_sim_tools simulator_bringup.sh
 ```
@@ -171,7 +171,7 @@ rosrun platform_sim_tools simulator_bringup.sh
 docker run --rm \
   -v "$(pwd)/ib2_user_ws:$(pwd)/ib2_user_ws" \
   ib2_simulator:latest \
-  bash -c "source /opt/ros/melodic/setup.bash && \
+  bash -c "source /opt/ros/noetic/setup.bash && \
            source /home/nvidia/IB2/Int-Ball2_platform_simulator/devel/setup.bash && \
            cd $(pwd)/ib2_user_ws && catkin_make"
 PWD=$(pwd) docker compose restart        # 必要に応じて
@@ -211,7 +211,7 @@ PWD=$(pwd) docker compose restart        # 必要に応じて
 | ---- | ------------ | ------ |
 | `Error: No such container: ib2_simulator` | コンテナ未起動 | `docker compose up -d` を実行 |
 | `Qt: cannot connect to X server` | DISPLAY 設定不一致 | ホスト / コンテナ双方の `$DISPLAY` を確認 |
-| ROS セットアップエラー | 環境スクリプト未読込 | `source /opt/ros/melodic/setup.bash` を実行 |
+| ROS セットアップエラー | 環境スクリプト未読込 | `source /opt/ros/noetic/setup.bash` を実行 |
 | 画面が表示されない | X11 ソケットマウント漏れ | `/tmp/.X11-unix:` マウントを確認 |
 
 詳細ログは:
