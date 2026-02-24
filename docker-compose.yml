@@ -2,15 +2,16 @@ services:
   simulator:
     image: ib2_simulator:latest
     container_name: ib2_simulator
+    runtime: nvidia
     # gpus: all　 # GPU搭載環境でGPUを使いたい場合はビルドする前にアンコメント
     privileged: true
     network_mode: host
     ipc: host
     environment:
       - DISPLAY # ホストのDISPLAY環境変数の値を反映する
-      # - NVIDIA_VISIBLE_DEVICES=all
-      # - NVIDIA_DRIVER_CAPABILITIES=all
-      - LIBGL_ALWAYS_INDIRECT=0  # WSLgでは直接描画が可能な場合が多い
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      # - LIBGL_ALWAYS_INDIRECT=0  # WSLgでは直接描画が可能な場合が多い
       - QT_X11_NO_MITSHM=1
       - MESA_GL_VERSION_OVERRIDE=3.3
     tty: true
@@ -28,4 +29,4 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/.X11-unix:/tmp/.X11-unix  # X11ソケット
       - /run/user/${UID}:/run/user/${UID}  # WaylandソケットやDBusがここにあることも
-    command: /sbin/init # 初期化スクリプトを実行せず、systemdのみを起動
+    # command: /sbin/init # 初期化スクリプトを実行せず、systemdのみを起動

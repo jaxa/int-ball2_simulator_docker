@@ -1,5 +1,5 @@
 # ステージ1: Qtをインストール
-FROM ubuntu:18.04 AS qt-builder
+FROM ubuntu:20.04 AS qt-builder
 # 注: Qt インストーラーはx86専用
 
 # ビルド引数として認証情報を受け取る
@@ -113,7 +113,7 @@ RUN cd /opt/Qt && \
     rm -f qt-installer-nonintaractive.qs
 
 # ステージ2: 最終イメージの構築
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 # 注: Qtインストーラーはx86専用
 
 ARG HOST_USER_PATH
@@ -136,17 +136,17 @@ RUN pip3 install psutil
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata
 ENV TZ=Asia/Tokyo
 
-# Install ROS Melodic
+# Install ROS Noetic
 RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 RUN curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add -
 RUN apt-get update
-RUN apt-get -y install ros-melodic-desktop-full
-RUN apt-get -y install python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install ros-noetic-desktop-full
+RUN apt -y install python3-rosdep python3-rosinstall python3-rosinstall-generator python3-wstool build-essential
 
 # Install gazebo packages
-RUN apt-get install -y ros-melodic-gazebo-*
+RUN apt-get install -y ros-noetic-gazebo-*
 
-RUN sed -i '/ROS_PYTHON_VERSION/s/^/#/; /ROS_PYTHON_VERSION/a export ROS_PYTHON_VERSION=3' /opt/ros/melodic/etc/catkin/profile.d/1.ros_python_version.sh
+# RUN sed -i '/ROS_PYTHON_VERSION/s/^/#/; /ROS_PYTHON_VERSION/a export ROS_PYTHON_VERSION=3' /opt/ros/noetic/etc/catkin/profile.d/1.ros_python_version.sh
 
 # Install Netwide Assembler (NASM)
 # RUN cd /usr/local/src && \
@@ -223,7 +223,7 @@ RUN pip3 install docker defusedxml netifaces
 # Download and build int-ball2_simulator
 RUN mkdir -p /home/nvidia
 WORKDIR /home/nvidia
-RUN git clone https://github.com/jaxa/int-ball2_simulator.git IB2
+RUN git clone -b noetic https://github.com/jaxa/int-ball2_simulator.git IB2
 
 # パラメータ書き換え用
 ## GSE
@@ -240,17 +240,16 @@ RUN sed -i 's/<arg name="container_ros_master_uri" default="[^"]*"/<arg name="co
 RUN sed -i 's#<arg name="host_ib2_workspace" default="[^"]*"#<arg name="host_ib2_workspace" default="'"$HOST_USER_PATH"'/ib2_user_ws"#' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/platform_sim/platform_sim_tools/launch/platform_manager_bringup.launch
 
 RUN cd /home/nvidia/IB2/Int-Ball2_platform_gse && \
-    /bin/bash -c "source /opt/ros/melodic/setup.bash; catkin_make"
+    /bin/bash -c "source /opt/ros/noetic/setup.bash; catkin_make -j1"
 RUN mkdir /var/log/ground_system && chown $USER:$USER /var/log/ground_system
-RUN apt-get install -y libpcl-dev ros-melodic-pcl-ros && \
+RUN apt-get install -y libpcl-dev ros-noetic-pcl-ros && \
     cd /home/nvidia/IB2/Int-Ball2_platform_simulator && \
-    /bin/bash -c "source /opt/ros/melodic/setup.bash; catkin_make -DWITH_PCA9685=OFF"
+    /bin/bash -c "source /opt/ros/noetic/setup.bash; catkin_make -DWITH_PCA9685=OFF"
 
-
-# 初期化スクリプトの追加
+# # 初期化スクリプトの追加
 COPY init-container.sh /
 RUN chmod +x /init-container.sh
 
 # コンテナ起動時のデフォルトコマンド
-CMD ["/init-container.sh"]
+# CMD ["/init-container.sh"]
 
