@@ -41,11 +41,11 @@ from std_msgs.msg import (
 
 # ***********************************************************************************
 # To convert quaternions in ROS applications, the tf(tf2) package is usually used.
-# However, to import tf(tf2) package from Python3 in ROS melodic,
+# However, to import tf(tf2) package from Python3 in ROS noetic,
 # the libraries needs to be rebuilt.
 # In this source code, we use the quaternion handling functions from the tf package.
 # See the following URL for the source code details.
-# https://github.com/ros/geometry/blob/melodic-devel/tf/src/tf/transformations.py
+# https://github.com/ros/geometry/blob/noetic-devel/tf/src/tf/transformations.py
 
 import numpy
 
