@@ -1,5 +1,0 @@
-# request
-string[] ids
----
-# response
-RosParam[] params   # param.type is Empty string: ''

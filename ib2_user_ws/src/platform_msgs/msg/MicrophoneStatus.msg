@@ -1,1 +1,0 @@
-platform_msgs/PowerStatus streaming_status
