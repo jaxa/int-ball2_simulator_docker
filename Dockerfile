@@ -237,7 +237,6 @@ RUN git clone -b noetic https://github.com/jaxa/int-ball2_simulator.git IB2
 #RUN sed -i 's/<arg name="ocs_port" default="[^"]*"/<arg name="ocs_port" default="34567"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/flight_software/trans_communication/launch/bringup.launch
 
 RUN sed -i 's/<arg name="container_ros_master_uri" default="[^"]*"/<arg name="container_ros_master_uri" default="http:\/\/172.17.0.1:11311"/' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/platform_sim/platform_sim_tools/launch/platform_manager_bringup.launch
-RUN sed -i 's#<arg name="host_ib2_workspace" default="[^"]*"#<arg name="host_ib2_workspace" default="'"$HOST_USER_PATH"'/ib2_user_ws"#' /home/nvidia/IB2/Int-Ball2_platform_simulator/src/platform_sim/platform_sim_tools/launch/platform_manager_bringup.launch
 
 RUN cd /home/nvidia/IB2/Int-Ball2_platform_gse && \
     /bin/bash -c "source /opt/ros/noetic/setup.bash; catkin_make -j1"
