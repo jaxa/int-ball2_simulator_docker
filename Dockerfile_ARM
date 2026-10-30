@@ -77,6 +77,7 @@ RUN apt-get update
 
 # Install Python3 packages
 RUN apt-get install -y python3 python3-pip
+RUN python3 -m pip install --upgrade pip
 RUN pip3 install rospkg 
 RUN pip3 install empy==3.3.4
 RUN pip3 install psutil
